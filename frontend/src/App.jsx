@@ -1,35 +1,90 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
+import IngredientInput from './components/IngredientInput';
+import IngredientList from './components/IngredientList';
+import RecipeList from './components/RecipeList';
+import Loader from './components/Loader';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [ingredients, setIngredients] = useState([]);
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Add ingredient (from input or detected)
+  const addIngredient = (ingredient) => {
+    setIngredients((prev) => {
+      const lower = ingredient.trim().toLowerCase();
+      if (!lower || prev.includes(lower)) return prev;
+      return [...prev, lower];
+    });
+  };
+
+  // Remove ingredient
+  const removeIngredient = (ingredient) => {
+    setIngredients((prev) => prev.filter((ing) => ing !== ingredient));
+  };
+
+  // Detect ingredients from image
+  const detectIngredients = async (imageFile) => {
+    setLoading(true);
+    const formData = new FormData();
+    formData.append('image', imageFile);
+    try {
+      const res = await fetch('http://localhost:5000/api/recipes/detect-ingredients', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      (data.ingredients || []).forEach(addIngredient);
+    } catch (err) {
+      alert('Failed to detect ingredients');
+    }
+    setLoading(false);
+  };
+
+  // Get recipes from backend
+  const getRecipes = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('http://localhost:5000/api/recipes/get-recipes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ingredients }),
+      });
+      const data = await res.json();
+      setRecipes(data.recipes || []);
+    } catch (err) {
+      alert('Failed to get recipes');
+    }
+    setLoading(false);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
+    <div className="main-bg">
+      <div className="app-container">
+        <h1 className="app-title">AI Cooking Assistant</h1>
+        <p className="subtitle">Discover recipes with what you have!</p>
+        <IngredientInput
+          onAdd={addIngredient}
+          onDetect={detectIngredients}
+          loading={loading}
+        />
+        <IngredientList
+          ingredients={ingredients}
+          onRemove={removeIngredient}
+        />
+        <button
+          className="get-recipes-btn"
+          onClick={getRecipes}
+          disabled={ingredients.length < 4 || loading}
+        >
+          Get Recipe Suggestions
         </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+        {loading && <Loader />}
+        <RecipeList recipes={recipes} />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;

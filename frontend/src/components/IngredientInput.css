@@ -1,0 +1,46 @@
+.ingredient-input-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 2rem 1.5rem;
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.input-label {
+  font-weight: 500;
+  min-width: 140px;
+}
+.text-input, .file-input {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+}
+.text-input:focus, .file-input:focus {
+  border: 1.5px solid #6c63ff;
+}
+.add-btn, .detect-btn {
+  background: linear-gradient(90deg, #6c63ff 60%, #48c6ef 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
+}
+.add-btn:disabled, .detect-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+} 

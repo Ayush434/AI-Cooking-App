@@ -1,0 +1,22 @@
+import './RecipeList.css';
+
+function RecipeList({ recipes }) {
+  if (!recipes.length) return null;
+  return (
+    <div className="recipes-list-card">
+      <h3>Recipe Suggestions:</h3>
+      <div className="recipe-cards">
+        {recipes.map((rec, idx) => (
+          <div className="recipe-card" key={idx}>
+            <div className="recipe-title">{rec.title}</div>
+            <div className="recipe-ingredients">
+              <b>Ingredients:</b> {rec.ingredients.join(', ')}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default RecipeList; 
