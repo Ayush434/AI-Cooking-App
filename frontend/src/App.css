@@ -11,6 +11,7 @@ body, html, #root {
   min-width: 100vw;
   background: #fff;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 2vw;
@@ -28,6 +29,9 @@ body, html, #root {
   gap: 2.2rem;
   align-items: center;
   border: 2.5px solid #e6e0ff;
+  /* Center horizontally */
+  margin-left: auto;
+  margin-right: auto;
 }
 .app-title {
   font-size: 2.2rem;
@@ -63,6 +67,60 @@ body, html, #root {
 .get-recipes-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
+}
+.main-new-recipe {
+  background: linear-gradient(90deg, #48c6ef 0%, #6c63ff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.9rem 1.8rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 0 auto 1.5rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+.main-new-recipe:active {
+  transform: scale(0.97);
+}
+.add-ingredient-btn {
+  background: linear-gradient(90deg, #6c63ff 60%, #48c6ef 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.7rem 1.5rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 0 auto;
+  display: block;
+  box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+.add-ingredient-btn:active {
+  transform: scale(0.97);
+}
+.footer {
+  /* Remove width: 100vw; */
+  text-align: center;
+  padding: 1.2rem 0 0.5rem 0;
+  color: #888;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  background: none;
+  width: 100%;
+  margin-top: auto;
+}
+.ingredient-note {
+  color: #6c63ff;
+  font-size: 1rem;
+  margin: 0.5rem 0 0.2rem 0.2rem;
+  font-weight: 500;
+  letter-spacing: 0.1px;
 }
 
 /* Responsive tweaks */
