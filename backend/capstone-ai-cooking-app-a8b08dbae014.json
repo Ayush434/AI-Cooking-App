@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "capstone-ai-cooking-app",
+  "private_key_id": "a8b08dbae014f6aecff7f5c5ef93eb14c9863004",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCxL76IL0cnN5Fj\noBxim2ObDCeBbpYw1jJzL521boOuF6+bIPUc5QigaLY1aBvh1WtRLzKtesAS2h2Z\n5zGht5+MgbbOMhKaZXQ2uQJLNQAckrQkaLiUVk9gt9gR/xr10JU0ln3V97MklosX\njfV06duycCucqsmvrnpYvHCNeh6M9RNrjyRVBo6erqffJXbdkz9HliGqgToJYU9W\n18X2MQAYvNMlcsmAHOYC6/qtXwBEVQjMwr/sW2IvCHycnAH5SrN4aAZ2jPBojbMm\nqeF1LJBR5CP9+L1TYOZGsccjaT9qoWRLBZnN5Vr8Yu1BEOuGEDwU4s55BQpxaqZm\nnMKz54rDAgMBAAECggEAAKJNmbollIfX3tXjVBz/Ob5M4+Mr6WfSzWO1ukD3eqd+\nCt2O0vgk1EIbqMxDEUdMt4EmOsWuK0MZiQPxQwVfrkaGi21VcLT9OfbmgbNiWTfT\nKjAvvOQkK5Hs1X+mrot9BS+mqp3Ux8Q8IizxXGY70YMiPNDFoPnMWUXvVypBMrrq\nPARrTLARG4f+tR9O7Xo2XsPL9QReYHdZ984Vf9sDi+tk3NenpMk+Fh0hndjTkL3D\nzYFR4590jGx3TvshXSyi6gJ2u4zMpsvqNc6nJ2EOiXdU8MvL+5xLhEsfcCRuMN4R\nxzWt2yKRSSTG95pbWHl/vRINuVmmK2Fb5hNTkAsSIQKBgQDmJ1Jpbh2K4X8cw0Bv\nn/LFEYAYuovmxzjej9AH7Fnaj0tOJS4zyAJCaVDsRU5zclzmmUGmKfLq2EYz7WOd\nuJ8xWp48kSBg/ZLpf7ZF9B1Qj6TVT6czgS1aYC45vpsbVFWvoaoj+k/8Zgal71X0\ndCWCB93ZrtaaeUE1olJd9p6zoQKBgQDFFaxIKI6g1aMAVkhRKdLcfN0GaVNTcE4s\n7Bc9SSTDW6hXcCV8rMP9RmZnZwkBArwK+yYPc25Ih1KtuRy5EkXiki+YwV0Ofo60\nHy+xTYU+GKI04wGKd9WFzLT4oqEEph0mcBcohRDQ+9GDfiK7Nhy2J3JZVGsBIZ1m\nd6B8Wldj4wKBgQDPMmdG8xM1jHxa8Ix58Y0lTPP9TzPTt1bDRsUJ3QWndYld+Kr3\ngwBFuXpYuqw90p9AGoi3htxiAAJzjSs5OpRWYjZCYIS9zIsOGyOFJpedhzPltafY\n/lpOGniDE82fdPUPAIOjkB2iJFen2yeOw2FhBqP67SPWPYMvPcrZPMTzAQKBgEDd\nq0BsqNTiu61muJKOE2qiZhSwIc66jeBXLCbtpf3ucu+kZ5IrQq5ft2CdFueQQNfU\nZWh8c3XHpDytSnjXPM0flC7QpZIZsVozUX0nqI0RioGhnWY3nr1U7NNQo3JmQf3e\nsqCRe0FtQD3pDAFWBAkn3ojsMfPDXozVHqsPCOhFAoGAbaChliPK3/slV/RfvyZI\nqPfw/5PCSn/REG/mH4GznhBzfnaSpH4AiUv9f+ijHm2v8CcK5If3/oqCUTO6x+jI\nffWvZTri4UId1vB8mIZ2zfMHmjJWPP0UE3D+ERVYOphR3WXORM59DboKkm6p7shm\noqSTiC37O82QUYPXLMlD1z8=\n-----END PRIVATE KEY-----\n",
+  "client_email": "google-cloud-vision-api@capstone-ai-cooking-app.iam.gserviceaccount.com",
+  "client_id": "102930465866359227423",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/google-cloud-vision-api%40capstone-ai-cooking-app.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
