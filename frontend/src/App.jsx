@@ -30,14 +30,23 @@ function App() {
     const formData = new FormData();
     formData.append('image', imageFile);
     try {
+      console.log('🔍 Calling detect-ingredients API...');
       const res = await fetch('http://localhost:5000/api/recipes/detect-ingredients', {
         method: 'POST',
         body: formData,
       });
+      console.log('📡 Response status:', res.status);
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
       const data = await res.json();
+      console.log('📦 Response data:', data);
       (data.ingredients || []).forEach(addIngredient);
     } catch (err) {
-      alert('Failed to detect ingredients');
+      console.error('❌ Error detecting ingredients:', err);
+      alert(`Failed to detect ingredients: ${err.message}`);
     }
     setLoading(false);
   };
@@ -46,15 +55,24 @@ function App() {
   const getRecipes = async () => {
     setLoading(true);
     try {
+      console.log('🍳 Calling get-recipes API with ingredients:', ingredients);
       const res = await fetch('http://localhost:5000/api/recipes/get-recipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ingredients }),
       });
+      console.log('📡 Response status:', res.status);
+      
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      
       const data = await res.json();
+      console.log('📦 Response data:', data);
       setRecipes(data.recipes || []);
     } catch (err) {
-      alert('Failed to get recipes');
+      console.error('❌ Error getting recipes:', err);
+      alert(`Failed to get recipes: ${err.message}`);
     }
     setLoading(false);
   };

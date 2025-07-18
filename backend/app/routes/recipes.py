@@ -10,6 +10,21 @@ recipes_bp = Blueprint('recipes', __name__)
 vision_service = VisionService()
 recipe_service = RecipeService()
 
+@recipes_bp.route('/health', methods=['GET'])
+def health_check():
+    """
+    Simple health check endpoint
+    """
+    return jsonify({
+        'status': 'healthy',
+        'message': 'API is working correctly',
+        'endpoints': [
+            '/api/recipes/health',
+            '/api/recipes/detect-ingredients',
+            '/api/recipes/get-recipes'
+        ]
+    })
+
 @recipes_bp.route('/detect-ingredients', methods=['POST'])
 def detect_ingredients():
     """
