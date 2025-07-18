@@ -1,28 +1,33 @@
 body, html, #root {
   min-height: 100vh;
+  min-width: 100vw;
   margin: 0;
   padding: 0;
   font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  background: #f6f7fb;
+  background: #fff;
 }
 .main-bg {
   min-height: 100vh;
-  background: linear-gradient(120deg, #e0e7ff 0%, #f6f7fb 100%);
+  min-width: 100vw;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2vw;
 }
 .app-container {
   width: 100%;
   max-width: 540px;
   margin: 2rem auto;
-  background: #fff;
-  border-radius: 24px;
-  box-shadow: 0 4px 32px rgba(76, 110, 245, 0.10);
+  background: #f8f7ff;
+  border-radius: 28px;
+  box-shadow: 0 6px 36px rgba(108,99,255,0.13);
   padding: 2.5rem 2rem 2rem 2rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 2.2rem;
+  align-items: center;
+  border: 2.5px solid #e6e0ff;
 }
 .app-title {
   font-size: 2.2rem;
@@ -42,15 +47,18 @@ body, html, #root {
   background: linear-gradient(90deg, #48c6ef 0%, #6c63ff 100%);
   color: #fff;
   border: none;
-  border-radius: 10px;
-  padding: 0.8rem 1.6rem;
-  font-size: 1.1rem;
+  border-radius: 12px;
+  padding: 0.9rem 1.8rem;
+  font-size: 1.15rem;
   font-weight: 700;
   cursor: pointer;
   margin: 0 auto;
   display: block;
   box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+.get-recipes-btn:active {
+  transform: scale(0.97);
 }
 .get-recipes-btn:disabled {
   background: #ccc;

@@ -12,6 +12,12 @@ function RecipeList({ recipes }) {
             <div className="recipe-ingredients">
               <b>Ingredients:</b> {rec.ingredients.join(', ')}
             </div>
+            {rec.instructions && (
+              <div className="recipe-instructions">
+                <b>Instructions:</b>
+                <div className="instructions-text">{rec.instructions}</div>
+              </div>
+            )}
           </div>
         ))}
       </div>
