@@ -56,6 +56,19 @@
   background: #ccc;
   cursor: not-allowed;
 }
+.image-label, .text-label {
+  font-weight: 600;
+  font-size: 1.08rem;
+  color: #6c63ff;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.2rem;
+}
+.label-icon {
+  font-size: 1.25rem;
+  margin-right: 0.2rem;
+}
 @media (max-width: 600px) {
   .ingredient-input-card {
     padding: 1.2rem 0.5rem;

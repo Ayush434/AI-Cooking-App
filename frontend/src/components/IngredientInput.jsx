@@ -25,16 +25,21 @@ function IngredientInput({ onAdd, onDetect, loading }) {
   return (
     <div className="ingredient-input-card">
       <div className="input-row">
-        <label className="input-label">Upload Fridge Image:</label>
+        <label className="input-label image-label">
+          <span role="img" aria-label="camera" className="label-icon">📷</span>
+          Upload a photo of your fridge or pantry:
+        </label>
         <input type="file" accept="image/*" onChange={handleImageChange} className="file-input" />
         <button className="detect-btn" onClick={handleDetect} disabled={!image || loading}>
           Detect Ingredients
         </button>
       </div>
 
-      
       <div className="input-row">
-        <label className="input-label">Or type ingredient:</label>
+        <label className="input-label text-label">
+          <span role="img" aria-label="edit" className="label-icon">✏️</span>
+          Or manually add an ingredient:
+        </label>
         <input
           className="text-input"
           value={input}

@@ -5,10 +5,14 @@ import IngredientList from './components/IngredientList';
 import RecipeList from './components/RecipeList';
 import Loader from './components/Loader';
 
+const currentYear = new Date().getFullYear();
+
 function App() {
   const [ingredients, setIngredients] = useState([]);
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(false); // For hiding get recipe button
+  const [mode, setMode] = useState('initial'); // 'initial', 'adding', 'afterRecipe'
 
   // Add ingredient (from input or detected)
   const addIngredient = (ingredient) => {
@@ -24,28 +28,28 @@ function App() {
     setIngredients((prev) => prev.filter((ing) => ing !== ingredient));
   };
 
+  // Clear all ingredients and recipes
+  const clearIngredients = () => {
+    setIngredients([]);
+    setRecipes([]);
+  };
+
   // Detect ingredients from image
   const detectIngredients = async (imageFile) => {
     setLoading(true);
     const formData = new FormData();
     formData.append('image', imageFile);
     try {
-      console.log('🔍 Calling detect-ingredients API...');
       const res = await fetch('http://localhost:5000/api/recipes/detect-ingredients', {
         method: 'POST',
         body: formData,
       });
-      console.log('📡 Response status:', res.status);
-      
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      
       const data = await res.json();
-      console.log('📦 Response data:', data);
       (data.ingredients || []).forEach(addIngredient);
     } catch (err) {
-      console.error('❌ Error detecting ingredients:', err);
       alert(`Failed to detect ingredients: ${err.message}`);
     }
     setLoading(false);
@@ -54,27 +58,36 @@ function App() {
   // Get recipes from backend
   const getRecipes = async () => {
     setLoading(true);
+    setButtonDisabled(true); // Hide button for 5 seconds
     try {
-      console.log('🍳 Calling get-recipes API with ingredients:', ingredients);
       const res = await fetch('http://localhost:5000/api/recipes/get-recipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ingredients }),
       });
-      console.log('📡 Response status:', res.status);
-      
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
-      
       const data = await res.json();
-      console.log('📦 Response data:', data);
       setRecipes(data.recipes || []);
+      setMode('afterRecipe');
     } catch (err) {
-      console.error('❌ Error getting recipes:', err);
       alert(`Failed to get recipes: ${err.message}`);
     }
     setLoading(false);
+    setTimeout(() => setButtonDisabled(false), 5000); // 5 seconds
+  };
+
+  // New Recipe button handler (full reset)
+  const handleNewRecipe = () => {
+    setIngredients([]);
+    setRecipes([]);
+    setMode('adding');
+  };
+
+  // Add Ingredient after recipe is shown
+  const handleAddIngredient = () => {
+    setMode('adding');
   };
 
   return (
@@ -82,25 +95,57 @@ function App() {
       <div className="app-container">
         <h1 className="app-title">AI Cooking Assistant</h1>
         <p className="subtitle">Discover recipes with what you have!</p>
-        <IngredientInput
-          onAdd={addIngredient}
-          onDetect={detectIngredients}
-          loading={loading}
-        />
-        <IngredientList
-          ingredients={ingredients}
-          onRemove={removeIngredient}
-        />
-        <button
-          className="get-recipes-btn"
-          onClick={getRecipes}
-          disabled={ingredients.length < 4 || loading}
-        >
-          Get Recipe Suggestions
-        </button>
+        {(mode === 'initial' || mode === 'afterRecipe') && (
+          <button
+            className="main-new-recipe new-recipe-btn"
+            onClick={handleNewRecipe}
+            style={{ marginBottom: '1.5rem' }}
+          >
+            New Recipe
+          </button>
+        )}
+        {mode === 'adding' && (
+          <>
+            <IngredientInput
+              onAdd={addIngredient}
+              onDetect={detectIngredients}
+              loading={loading}
+            />
+            <div style={{ width: '100%' }}>
+              <IngredientList
+                ingredients={ingredients}
+                onRemove={removeIngredient}
+                onClear={clearIngredients}
+              />
+              <p className="ingredient-note">You need at least <b>4 ingredients</b> to generate recipe suggestions.</p>
+            </div>
+            <button
+              className="get-recipes-btn"
+              onClick={getRecipes}
+              disabled={ingredients.length < 4 || loading || buttonDisabled}
+              style={{ display: buttonDisabled ? 'none' : 'block' }}
+            >
+              Get Recipe Suggestions
+            </button>
+          </>
+        )}
         {loading && <Loader />}
-        <RecipeList recipes={recipes} />
+        {mode === 'afterRecipe' && (
+          <>
+            <RecipeList recipes={recipes} />
+            <button
+              className="add-ingredient-btn"
+              onClick={handleAddIngredient}
+              style={{ marginTop: '1.5rem' }}
+            >
+              Add Ingredient
+            </button>
+          </>
+        )}
       </div>
+      <footer className="footer">
+        &copy; {currentYear} Ayush Mehta
+      </footer>
     </div>
   );
 }

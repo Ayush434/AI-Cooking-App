@@ -41,4 +41,24 @@
 .empty {
   color: #aaa;
   font-style: italic;
+}
+.clear-btn {
+  background: linear-gradient(90deg, #ff6b6b 60%, #ffb86b 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.08);
+  margin-left: 0.5rem;
+}
+.clear-btn:active {
+  transform: scale(0.97);
+}
+.clear-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 } 
