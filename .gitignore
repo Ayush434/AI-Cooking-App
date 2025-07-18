@@ -44,4 +44,3 @@ backend/capstone-ai-cooking-app-*.json
 
 # Node modules (if frontend exists)
 node_modules/ 
-backend/.env
