@@ -7,7 +7,7 @@ class VisionService:
         # Set the Google Cloud credentials
         credentials_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            'capstone-ai-cooking-app-a8b08dbae014.json'
+            'capstone-ai-cooking-app-5692391a2963.json'
         )
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
         self.client = vision.ImageAnnotatorClient()
