@@ -1,8 +1,7 @@
 .ingredient-input-card {
-  background: linear-gradient(120deg, #e0e7ff 60%, #f3f4fa 100%);
-  border-radius: 20px;
-  box-shadow: 0 4px 24px rgba(108,99,255,0.10);
-  border: 2.5px solid #fff;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
   padding: 2rem 1.5rem;
   margin-bottom: 2rem;
   display: flex;
@@ -23,22 +22,20 @@
   flex-wrap: wrap;
 }
 .input-label {
-  font-weight: 600;
+  font-weight: 500;
   min-width: 140px;
-  color: #6c63ff;
 }
 .text-input, .file-input {
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  border: 1.5px solid #e6e0ff;
+  border: 1px solid #ddd;
   font-size: 1rem;
   outline: none;
-  transition: border 0.2s, box-shadow 0.2s;
+  transition: border 0.2s;
   background: #fff;
 }
 .text-input:focus, .file-input:focus {
   border: 1.5px solid #6c63ff;
-  box-shadow: 0 0 0 2px #e0e7ff;
 }
 .add-btn, .detect-btn {
   background: linear-gradient(90deg, #6c63ff 60%, #48c6ef 100%);
@@ -49,7 +46,7 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  transition: background 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
 }
 .add-btn:active, .detect-btn:active {

@@ -21,4 +21,4 @@ def get_recipes():
             {'title': 'Tomato Cheese Sandwich', 'ingredients': ingredients},
             {'title': 'Lettuce Salad', 'ingredients': ingredients}
         ]
-    }) 
+    })
