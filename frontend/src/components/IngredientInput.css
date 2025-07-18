@@ -7,11 +7,19 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  transition: box-shadow 0.2s, transform 0.15s;
+  position: relative;
+  z-index: 2;
+}
+.ingredient-input-card:focus-within, .ingredient-input-card:hover {
+  box-shadow: 0 8px 32px rgba(108,99,255,0.18);
+  transform: scale(1.015);
 }
 .input-row {
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 .input-label {
   font-weight: 500;
@@ -24,6 +32,7 @@
   font-size: 1rem;
   outline: none;
   transition: border 0.2s;
+  background: #fff;
 }
 .text-input:focus, .file-input:focus {
   border: 1.5px solid #6c63ff;
@@ -40,7 +49,22 @@
   transition: background 0.2s, box-shadow 0.2s;
   box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
 }
+.add-btn:active, .detect-btn:active {
+  transform: scale(0.97);
+}
 .add-btn:disabled, .detect-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
+}
+@media (max-width: 600px) {
+  .ingredient-input-card {
+    padding: 1.2rem 0.5rem;
+    border-radius: 0;
+    margin-bottom: 1.2rem;
+  }
+  .input-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7rem;
+  }
 } 
