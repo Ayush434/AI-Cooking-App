@@ -125,20 +125,39 @@ function IngredientInput({ onAdd, onDetect, loading }) {
           Or manually add an ingredient:
         </label>
         
-        {/* Validation feedback above input - completely separate */}
+        {/* Validation feedback above everything - completely separate */}
         {validationResult && (
-          <div className={`validation-feedback-above ${validationResult.is_valid ? 'valid' : 'invalid'}`}>
-            {validationResult.is_valid ? (
-              <span className="valid-icon">✓</span>
-            ) : (
-              <span className="invalid-icon">✗</span>
-            )}
-            {validationResult.corrected && validationResult.corrected !== validationResult.original && (
-              <span className="correction">Did you mean: <strong>{validationResult.corrected}</strong>?</span>
-            )}
-            {autocompleteResults.length > 0 && (
-              <span className="more-suggestions">(More suggestions available)</span>
-            )}
+          <div className="validation-above">
+            <div className={`validation-box ${validationResult.is_valid ? 'valid' : 'invalid'}`}>
+              {validationResult.is_valid ? (
+                <span className="valid-icon">✓</span>
+              ) : (
+                <span className="invalid-icon">✗</span>
+              )}
+              {validationResult.corrected && validationResult.corrected !== validationResult.original && (
+                <span className="correction">Did you mean: <strong>{validationResult.corrected}</strong>?</span>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {/* Suggestions - moved above input */}
+        {suggestions.length > 0 && (
+          <div className="suggestions-above">
+            <div className="suggestions-container">
+              <div className="suggestions-label">Did you mean:</div>
+              <div className="suggestions-list">
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    className="suggestion-btn"
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         )}
         
@@ -155,7 +174,7 @@ function IngredientInput({ onAdd, onDetect, loading }) {
             />
             {validating && <div className="validating-indicator">Validating...</div>}
             
-            {/* Autocomplete Dropdown */}
+            {/* Autocomplete Dropdown - below input */}
             {showAutocomplete && autocompleteResults.length > 0 && (
               <div className="autocomplete-dropdown">
                 {autocompleteResults.map((suggestion, index) => (
@@ -176,24 +195,6 @@ function IngredientInput({ onAdd, onDetect, loading }) {
           <button className="add-btn" onClick={handleAdd} disabled={!input.trim()}>Add</button>
         </div>
       </div>
-      
-      {/* Suggestions */}
-      {suggestions.length > 0 && (
-        <div className="suggestions-container">
-          <div className="suggestions-label">Did you mean:</div>
-          <div className="suggestions-list">
-            {suggestions.map((suggestion, index) => (
-              <button
-                key={index}
-                className="suggestion-btn"
-                onClick={() => handleSuggestionClick(suggestion)}
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
