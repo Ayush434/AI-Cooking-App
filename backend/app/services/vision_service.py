@@ -1,6 +1,7 @@
 import os
 from google.cloud import vision
 import io
+from .food_validation_service import FoodValidationService
 
 class VisionService:
     def __init__(self):
@@ -11,6 +12,9 @@ class VisionService:
         )
         os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = credentials_path
         self.client = vision.ImageAnnotatorClient()
+        
+        # Initialize food validation service
+        self.food_validator = FoodValidationService()
 
     def detect_ingredients_from_image(self, image_file):
         """
@@ -57,11 +61,29 @@ class VisionService:
             # Remove duplicates and return unique ingredients
             unique_ingredients = list(set(detected_ingredients))
             
+            # Validate and correct ingredients using food validation service
+            validated_ingredients = []
+            validation_results = []
+            
+            for ingredient in unique_ingredients[:10]:  # Limit to 10 ingredients
+                validation_result = self.food_validator.validate_ingredient(ingredient)
+                validation_results.append(validation_result)
+                
+                if validation_result['is_valid']:
+                    validated_ingredients.append(validation_result['corrected'])
+                else:
+                    # If not valid, try to use the best suggestion
+                    if validation_result['suggestions']:
+                        validated_ingredients.append(validation_result['suggestions'][0])
+                    else:
+                        # Keep the original if no suggestions available
+                        validated_ingredients.append(ingredient)
+            
             # If no ingredients detected, return some common ones as fallback
-            if not unique_ingredients:
-                unique_ingredients = ['tomato', 'onion', 'garlic']
+            if not validated_ingredients:
+                validated_ingredients = ['tomato', 'onion', 'garlic']
 
-            return unique_ingredients[:10]  # Limit to 10 ingredients
+            return validated_ingredients
 
         except Exception as e:
             print(f"Error detecting ingredients: {str(e)}")

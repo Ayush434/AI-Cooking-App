@@ -48,7 +48,16 @@ function App() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       const data = await res.json();
+      
+      // The backend now automatically validates and corrects ingredients
+      // from Google Vision API, so we can add them directly
       (data.ingredients || []).forEach(addIngredient);
+      
+      // Show a message if ingredients were corrected
+      const originalCount = data.ingredients?.length || 0;
+      if (originalCount > 0) {
+        console.log(`Detected and validated ${originalCount} ingredients from image`);
+      }
     } catch (err) {
       alert(`Failed to detect ingredients: ${err.message}`);
     }
