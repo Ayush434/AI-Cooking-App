@@ -128,9 +128,13 @@ class FoodValidationService:
         for category_items in self.food_categories.values():
             self.all_food_items.extend(category_items)
 
-    def validate_ingredient(self, ingredient: str) -> Dict:
+    def validate_ingredient(self, ingredient: str, prioritize_api: bool = False) -> Dict:
         """
         Validate if an ingredient is actually a food item and suggest corrections
+        
+        Args:
+            ingredient: The ingredient to validate
+            prioritize_api: If True, prioritize Open Food Facts API over local database
         """
         ingredient = ingredient.lower().strip()
         
@@ -156,25 +160,50 @@ class FoodValidationService:
                 'source': 'typo_correction'
             }
         
-        # First, try to find exact match in our food database
-        if self._is_exact_food_match(ingredient):
-            return {
-                'is_valid': True,
-                'original': ingredient,
-                'corrected': ingredient,
-                'confidence': 1.0,
-                'suggestions': []
-            }
-        
-        # Try fuzzy matching with our food database
-        fuzzy_result = self._fuzzy_match_ingredient(ingredient)
-        if fuzzy_result['is_valid']:
-            return fuzzy_result
-        
-        # Try Open Food Facts API search (with stricter validation)
-        of_result = self._search_openfoodfacts(ingredient)
-        if of_result['is_valid']:
-            return of_result
+        if prioritize_api:
+            # Prioritize Open Food Facts API over local database
+            # Try Open Food Facts API search first
+            of_result = self._search_openfoodfacts(ingredient)
+            if of_result['is_valid']:
+                return of_result
+            
+            # Then try local database as fallback
+            if self._is_exact_food_match(ingredient):
+                return {
+                    'is_valid': True,
+                    'original': ingredient,
+                    'corrected': ingredient,
+                    'confidence': 1.0,
+                    'suggestions': [],
+                    'source': 'local_database'
+                }
+            
+            # Try fuzzy matching with our food database
+            fuzzy_result = self._fuzzy_match_ingredient(ingredient)
+            if fuzzy_result['is_valid']:
+                return fuzzy_result
+        else:
+            # Original flow: prioritize local database over API
+            # First, try to find exact match in our food database
+            if self._is_exact_food_match(ingredient):
+                return {
+                    'is_valid': True,
+                    'original': ingredient,
+                    'corrected': ingredient,
+                    'confidence': 1.0,
+                    'suggestions': [],
+                    'source': 'local_database'
+                }
+            
+            # Try fuzzy matching with our food database
+            fuzzy_result = self._fuzzy_match_ingredient(ingredient)
+            if fuzzy_result['is_valid']:
+                return fuzzy_result
+            
+            # Try Open Food Facts API search (with stricter validation)
+            of_result = self._search_openfoodfacts(ingredient)
+            if of_result['is_valid']:
+                return of_result
         
         # If no match found, return invalid with suggestions
         return {
@@ -185,13 +214,17 @@ class FoodValidationService:
             'suggestions': self._get_suggestions(ingredient)
         }
 
-    def validate_ingredients_list(self, ingredients: List[str]) -> List[Dict]:
+    def validate_ingredients_list(self, ingredients: List[str], prioritize_api: bool = False) -> List[Dict]:
         """
         Validate a list of ingredients and return validation results for each
+        
+        Args:
+            ingredients: List of ingredients to validate
+            prioritize_api: If True, prioritize Open Food Facts API over local database
         """
         results = []
         for ingredient in ingredients:
-            result = self.validate_ingredient(ingredient)
+            result = self.validate_ingredient(ingredient, prioritize_api=prioritize_api)
             results.append(result)
         return results
 

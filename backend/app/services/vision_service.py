@@ -29,44 +29,23 @@ class VisionService:
             response = self.client.label_detection(image=image)
             labels = response.label_annotations
 
-            # Filter for food-related ingredients
-            food_keywords = [
-                'food', 'vegetable', 'fruit', 'meat', 'dairy', 'grain', 'spice',
-                'herb', 'nut', 'seed', 'tomato', 'onion', 'garlic', 'potato',
-                'carrot', 'lettuce', 'spinach', 'broccoli', 'cauliflower',
-                'bell pepper', 'cucumber', 'mushroom', 'eggplant', 'zucchini',
-                'squash', 'corn', 'peas', 'beans', 'rice', 'pasta', 'bread',
-                'cheese', 'milk', 'yogurt', 'butter', 'egg', 'chicken', 'beef',
-                'pork', 'fish', 'shrimp', 'salmon', 'tuna', 'apple', 'banana',
-                'orange', 'lemon', 'lime', 'strawberry', 'blueberry', 'grape',
-                'peach', 'pear', 'plum', 'cherry', 'mango', 'pineapple',
-                'coconut', 'avocado', 'olive', 'almond', 'walnut', 'peanut',
-                'cashew', 'pistachio', 'sunflower seed', 'pumpkin seed',
-                'flour', 'sugar', 'salt', 'pepper', 'oil', 'vinegar',
-                'soy sauce', 'ketchup', 'mustard', 'mayonnaise'
-            ]
-
+            # Extract all detected labels without hardcoded filtering
             detected_ingredients = []
             for label in labels:
-                label_text = label.description.lower()
-                # Check if the label contains food-related keywords
-                for keyword in food_keywords:
-                    if keyword in label_text:
-                        # Clean up the ingredient name
-                        ingredient = label_text.replace('food', '').replace('vegetable', '').replace('fruit', '').strip()
-                        if ingredient and len(ingredient) > 2:
-                            detected_ingredients.append(ingredient)
-                        break
+                label_text = label.description.lower().strip()
+                # Only filter out very short or non-descriptive labels
+                if len(label_text) > 2 and label_text not in ['food', 'vegetable', 'fruit', 'ingredient']:
+                    detected_ingredients.append(label_text)
 
             # Remove duplicates and return unique ingredients
             unique_ingredients = list(set(detected_ingredients))
             
-            # Validate and correct ingredients using food validation service
+            # Validate and correct ingredients using food validation service (which uses Open Food Facts API)
             validated_ingredients = []
             validation_results = []
             
-            for ingredient in unique_ingredients[:10]:  # Limit to 10 ingredients
-                validation_result = self.food_validator.validate_ingredient(ingredient)
+            for ingredient in unique_ingredients[:15]:  # Increased limit to get more candidates
+                validation_result = self.food_validator.validate_ingredient(ingredient, prioritize_api=True)
                 validation_results.append(validation_result)
                 
                 if validation_result['is_valid']:
