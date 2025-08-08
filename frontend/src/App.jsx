@@ -66,6 +66,20 @@ function App() {
     setLoading(false);
   };
 
+  // Check if a recipe appears complete
+  const isRecipeComplete = (recipe) => {
+    if (!recipe || !recipe.markdown_content) return false;
+    
+    const content = recipe.markdown_content;
+    const hasTitle = content.includes('#');
+    const hasIngredients = content.toLowerCase().includes('## ingredients');
+    const hasInstructions = content.toLowerCase().includes('## instructions');
+    const hasSteps = /[1-5]\./g.test(content); // Has numbered steps
+    const hasReasonableLength = content.length > 200;
+    
+    return hasTitle && hasIngredients && hasInstructions && hasSteps && hasReasonableLength;
+  };
+
   // Get recipes from backend
   const getRecipes = async () => {
     setLoading(true);
@@ -84,7 +98,18 @@ function App() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       const data = await res.json();
-      setRecipes(data.recipes || []);
+      const recipes = data.recipes || [];
+      
+      // Validate that recipes are complete before displaying
+      const hasCompleteRecipes = recipes.length > 0 && recipes.some(isRecipeComplete);
+      
+      if (!hasCompleteRecipes && recipes.length > 0) {
+        console.warn('Received incomplete recipes, waiting a bit longer...');
+        // Add a small delay for incomplete recipes
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      setRecipes(recipes);
       setMode('afterRecipe');
     } catch (err) {
       alert(`Failed to get recipes: ${err.message}`);
@@ -216,7 +241,12 @@ function App() {
         {loading && <Loader />}
         {mode === 'afterRecipe' && (
           <>
-            <RecipeList recipes={recipes} />
+            <RecipeList 
+              recipes={recipes} 
+              originalIngredients={ingredients}
+              dietaryPreferences={dietaryPreferences}
+              servingSize={servingSize}
+            />
             <button
               className="add-ingredient-btn"
               onClick={handleAddIngredient}
