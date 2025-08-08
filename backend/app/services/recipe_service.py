@@ -16,7 +16,7 @@ class RecipeService:
             api_key=self.hf_token,
         ) if self.hf_token else None
 
-    def get_recipes_from_ingredients(self, ingredients: List[str]) -> List[dict]:
+    def get_recipes_from_ingredients(self, ingredients: List[str], dietary_preferences: str = '', serving_size: int = 1) -> List[dict]:
         """
         Generate recipes from a list of ingredients using Mistral model via Together AI
         """
@@ -28,21 +28,29 @@ class RecipeService:
 
             ingredients_string = ", ".join(ingredients)
             
+            # Build dietary preferences text
+            dietary_text = ""
+            if dietary_preferences and dietary_preferences.strip():
+                dietary_text = f"\n\nDietary Requirements/Preferences: {dietary_preferences.strip()}"
+            
+            # Build serving size text
+            serving_text = f"\n\nServing Size: This recipe should serve {serving_size} {'person' if serving_size == 1 else 'people'}."
+            
             # Create the prompt for recipe generation
             prompt = f"""You are a helpful cooking assistant. Given the following ingredients, create a delicious and practical recipe.
 
-Ingredients: {ingredients_string}
+Ingredients: {ingredients_string}{dietary_text}{serving_text}
 
 Please provide a recipe with the following format:
 Title: [Recipe Name]
-Ingredients: [List of ingredients with quantities]
+Ingredients: [List of ingredients with quantities adjusted for {serving_size} {'person' if serving_size == 1 else 'people'}]
 Instructions: [Step-by-step cooking instructions]
 
 Make sure the recipe is:
 - Easy to follow
 - Uses the provided ingredients as the main components
-- Includes reasonable quantities and cooking times
-- Safe and practical for home cooking"""
+- Includes reasonable quantities and cooking times adjusted for {serving_size} {'person' if serving_size == 1 else 'people'}
+- Safe and practical for home cooking{' and follows the dietary preferences specified' if dietary_preferences else ''}"""
 
             print(f"Calling Mistral API with token: {self.hf_token[:10]}...")
             print(f"Input ingredients: {ingredients_string}")
