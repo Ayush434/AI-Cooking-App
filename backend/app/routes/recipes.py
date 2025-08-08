@@ -73,8 +73,16 @@ def get_recipes():
         if not ingredients:
             return jsonify({'error': 'Empty ingredients list'}), 400
         
+        # Get optional parameters
+        dietary_preferences = data.get('dietary_preferences', '')
+        serving_size = data.get('serving_size', 1)
+        
         # Generate recipes using Hugging Face API
-        recipes = recipe_service.get_recipes_from_ingredients(ingredients)
+        recipes = recipe_service.get_recipes_from_ingredients(
+            ingredients, 
+            dietary_preferences=dietary_preferences, 
+            serving_size=serving_size
+        )
         
         return jsonify({
             'recipes': recipes,
@@ -88,7 +96,7 @@ def get_recipes():
                 {
                     'title': 'Fallback Recipe',
                     'ingredients': ingredients if 'ingredients' in locals() else ['tomato', 'onion'],
-                    'instructions': 'This is a fallback recipe due to API error.'
+                    'instructions': f'This is a fallback recipe due to API error. Recipe for {serving_size if "serving_size" in locals() else 1} {"person" if (serving_size if "serving_size" in locals() else 1) == 1 else "people"}.'
                 }
             ],
             'message': 'Using fallback recipes due to API error'

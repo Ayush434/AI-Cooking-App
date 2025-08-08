@@ -92,11 +92,119 @@
   cursor: not-allowed;
 }
 
+/* Markdown content styling */
+.recipe-markdown {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+.recipe-markdown h1 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #6c63ff;
+  margin: 0 0 1rem 0;
+  border-bottom: 2px solid #6c63ff;
+  padding-bottom: 0.3rem;
+}
+
+.recipe-markdown h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #4c4c4c;
+  margin: 1.2rem 0 0.6rem 0;
+  border-left: 3px solid #6c63ff;
+  padding-left: 0.6rem;
+}
+
+.recipe-markdown h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #555;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.recipe-markdown ul {
+  margin: 0.5rem 0;
+  padding-left: 1.2rem;
+}
+
+.recipe-markdown ol {
+  margin: 0.5rem 0;
+  padding-left: 1.2rem;
+  counter-reset: step-counter;
+}
+
+.recipe-markdown ol li {
+  margin: 0.4rem 0;
+  line-height: 1.5;
+  position: relative;
+}
+
+.recipe-markdown ul li {
+  margin: 0.3rem 0;
+  line-height: 1.4;
+  list-style-type: none;
+  position: relative;
+}
+
+.recipe-markdown ul li::before {
+  content: "•";
+  color: #6c63ff;
+  font-weight: bold;
+  position: absolute;
+  left: -1rem;
+}
+
+.recipe-markdown ol li::marker {
+  color: #6c63ff;
+  font-weight: 600;
+}
+
+.recipe-markdown p {
+  margin: 0.5rem 0;
+  line-height: 1.5;
+}
+
+.recipe-markdown strong {
+  color: #444;
+  font-weight: 600;
+}
+
+.recipe-markdown em {
+  color: #666;
+  font-style: italic;
+}
+
+/* Custom styling for ingredients section */
+.recipe-markdown h2:nth-of-type(1) {
+  color: #2d5a27;
+  border-left-color: #2d5a27;
+}
+
+/* Custom styling for instructions section */
+.recipe-markdown h2:nth-of-type(2) {
+  color: #8e44ad;
+  border-left-color: #8e44ad;
+}
+
+/* Custom styling for tips section */
+.recipe-markdown h2:nth-of-type(3) {
+  color: #e67e22;
+  border-left-color: #e67e22;
+}
+
 @media (max-width: 600px) {
   .recipe-cards {
     grid-template-columns: 1fr;
   }
   .instructions-text {
     max-height: 150px;
+  }
+  .recipe-markdown h1 {
+    font-size: 1.2rem;
+  }
+  .recipe-markdown h2 {
+    font-size: 1rem;
   }
 }

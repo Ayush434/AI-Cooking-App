@@ -13,6 +13,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false); // For hiding get recipe button
   const [mode, setMode] = useState('initial'); // 'initial', 'adding', 'afterRecipe'
+  const [dietaryPreferences, setDietaryPreferences] = useState(''); // New state for dietary preferences
+  const [servingSize, setServingSize] = useState(1); // New state for serving size
 
   // Add ingredient (from input or detected)
   const addIngredient = (ingredient) => {
@@ -72,7 +74,11 @@ function App() {
       const res = await fetch('http://localhost:5000/api/recipes/get-recipes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ingredients }),
+        body: JSON.stringify({ 
+          ingredients,
+          dietary_preferences: dietaryPreferences.trim(),
+          serving_size: servingSize
+        }),
       });
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
@@ -91,6 +97,8 @@ function App() {
   const handleNewRecipe = () => {
     setIngredients([]);
     setRecipes([]);
+    setDietaryPreferences('');
+    setServingSize(1);
     setMode('adding');
   };
 
@@ -127,6 +135,73 @@ function App() {
                 onClear={clearIngredients}
               />
               <p className="ingredient-note">You need at least <b>4 ingredients</b> to generate recipe suggestions.</p>
+              
+              {/* Dietary Preferences and Serving Size Section */}
+              <div className="recipe-preferences" style={{ 
+                marginTop: '1rem', 
+                marginBottom: '1rem',
+                padding: '1rem',
+                backgroundColor: '#f8f9fa',
+                borderRadius: '8px',
+                border: '1px solid #e9ecef'
+              }}>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label htmlFor="dietary-preferences" style={{ 
+                    display: 'block', 
+                    marginBottom: '0.5rem', 
+                    fontWeight: '600',
+                    color: '#495057'
+                  }}>
+                    Dietary Preferences (Optional):
+                  </label>
+                  <textarea
+                    id="dietary-preferences"
+                    value={dietaryPreferences}
+                    onChange={(e) => setDietaryPreferences(e.target.value)}
+                    placeholder="Add specific details like 'more protein', 'less fat', 'gluten-free', 'vegetarian', 'low sodium', etc."
+                    rows="3"
+                    style={{
+                      width: '100%',
+                      padding: '0.5rem',
+                      border: '1px solid #ced4da',
+                      borderRadius: '4px',
+                      fontSize: '14px',
+                      resize: 'vertical',
+                      fontFamily: 'inherit'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="serving-size" style={{ 
+                    display: 'block', 
+                    marginBottom: '0.5rem', 
+                    fontWeight: '600',
+                    color: '#495057'
+                  }}>
+                    Number of Servings:
+                  </label>
+                  <select
+                    id="serving-size"
+                    value={servingSize}
+                    onChange={(e) => setServingSize(parseInt(e.target.value))}
+                    style={{
+                      padding: '0.5rem',
+                      border: '1px solid #ced4da',
+                      borderRadius: '4px',
+                      fontSize: '14px',
+                      backgroundColor: 'white',
+                      minWidth: '100px'
+                    }}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                      <option key={num} value={num}>
+                        {num} {num === 1 ? 'person' : 'people'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
             <button
               className="get-recipes-btn"
