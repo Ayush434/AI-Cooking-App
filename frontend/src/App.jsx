@@ -138,13 +138,96 @@ function App() {
         <h1 className="app-title">AI Cooking Assistant</h1>
         <p className="subtitle">Discover recipes with what you have!</p>
         {(mode === 'initial' || mode === 'afterRecipe') && (
-          <button
-            className="main-new-recipe new-recipe-btn"
-            onClick={handleNewRecipe}
-            style={{ marginBottom: '1.5rem' }}
-          >
-            New Recipe
-          </button>
+          <>
+            <button
+              className="main-new-recipe new-recipe-btn"
+              onClick={handleNewRecipe}
+              style={{ marginBottom: '2rem' }}
+            >
+              New Recipe
+            </button>
+            
+            {/* Show informational content only on initial load */}
+            {mode === 'initial' && (
+              <div className="home-content">
+                {/* Why Use This App Section */}
+                <div className="info-section">
+                  <h2>🍳 Why Use AI Cooking Assistant?</h2>
+                  <div className="benefits-grid">
+                    <div className="benefit-card">
+                      <div className="benefit-icon">🥘</div>
+                      <h3>Use What You Have</h3>
+                      <p>Transform ingredients sitting in your fridge into delicious meals. No more food waste!</p>
+                    </div>
+                    <div className="benefit-card">
+                      <div className="benefit-icon">🤖</div>
+                      <h3>AI-Powered Recipes</h3>
+                      <p>Get personalized recipe suggestions powered by advanced AI technology.</p>
+                    </div>
+                    <div className="benefit-card">
+                      <div className="benefit-icon">⚡</div>
+                      <h3>Quick & Easy</h3>
+                      <p>Find recipes in seconds. Perfect for busy schedules and spontaneous cooking.</p>
+                    </div>
+                    <div className="benefit-card">
+                      <div className="benefit-icon">🍽️</div>
+                      <h3>Dietary Preferences</h3>
+                      <p>Customize recipes for your dietary needs - vegetarian, gluten-free, and more!</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* How It Works Section */}
+                <div className="info-section">
+                  <h2>📋 How It Works</h2>
+                  <div className="steps-container">
+                    <div className="step-card">
+                      <div className="step-number">1</div>
+                      <h3>Add Ingredients</h3>
+                      <p>Type in ingredients you have or take a photo to detect them automatically</p>
+                    </div>
+                    <div className="step-card">
+                      <div className="step-number">2</div>
+                      <h3>Set Preferences</h3>
+                      <p>Specify dietary preferences and number of servings</p>
+                    </div>
+                    <div className="step-card">
+                      <div className="step-number">3</div>
+                      <h3>Get Recipes</h3>
+                      <p>Receive personalized, AI-generated recipes with step-by-step instructions</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Features Section */}
+                <div className="info-section">
+                  <h2>✨ Features</h2>
+                  <div className="features-list">
+                    <div className="feature-item">
+                      <span className="feature-icon">📸</span>
+                      <strong>Image Recognition:</strong> Take photos of ingredients for automatic detection
+                    </div>
+                    <div className="feature-item">
+                      <span className="feature-icon">✅</span>
+                      <strong>Ingredient Validation:</strong> Smart validation ensures you're using real food items
+                    </div>
+                    <div className="feature-item">
+                      <span className="feature-icon">🍃</span>
+                      <strong>Dietary Options:</strong> Support for various dietary restrictions and preferences
+                    </div>
+                    <div className="feature-item">
+                      <span className="feature-icon">👥</span>
+                      <strong>Serving Sizes:</strong> Adjust recipes for 1-10 people automatically
+                    </div>
+                    <div className="feature-item">
+                      <span className="feature-icon">📱</span>
+                      <strong>Mobile Friendly:</strong> Works perfectly on all devices
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
         {mode === 'adding' && (
           <>
