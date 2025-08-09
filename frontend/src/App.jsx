@@ -15,6 +15,55 @@ function App() {
   const [mode, setMode] = useState('initial'); // 'initial', 'adding', 'afterRecipe'
   const [dietaryPreferences, setDietaryPreferences] = useState(''); // New state for dietary preferences
   const [servingSize, setServingSize] = useState(1); // New state for serving size
+  const [randomIngredients, setRandomIngredients] = useState([]); // State for random ingredients
+
+  // Comprehensive list of common ingredients
+  const ingredientList = [
+    // Proteins
+    'chicken breast', 'ground beef', 'salmon', 'eggs', 'tofu', 'shrimp', 'pork chops', 'turkey', 'tuna', 'bacon',
+    'black beans', 'chickpeas', 'lentils', 'quinoa', 'greek yogurt', 'cottage cheese', 'almonds', 'walnuts',
+    
+    // Vegetables
+    'tomatoes', 'onions', 'garlic', 'bell peppers', 'mushrooms', 'spinach', 'broccoli', 'carrots', 'potatoes',
+    'sweet potatoes', 'zucchini', 'cucumber', 'lettuce', 'celery', 'corn', 'peas', 'green beans', 'asparagus',
+    'cauliflower', 'brussels sprouts', 'kale', 'cabbage', 'eggplant', 'avocado', 'cilantro', 'parsley',
+    
+    // Fruits
+    'bananas', 'apples', 'lemons', 'limes', 'oranges', 'strawberries', 'blueberries', 'grapes', 'pineapple',
+    'mango', 'papaya', 'kiwi', 'peaches', 'pears', 'cherries', 'watermelon', 'cantaloupe',
+    
+    // Grains & Starches
+    'rice', 'pasta', 'bread', 'oats', 'barley', 'couscous', 'bulgur', 'tortillas', 'crackers', 'noodles',
+    
+    // Dairy & Alternatives
+    'milk', 'cheese', 'butter', 'cream', 'sour cream', 'mozzarella', 'parmesan', 'cheddar', 'feta',
+    'coconut milk', 'almond milk', 'cream cheese',
+    
+    // Pantry Staples
+    'olive oil', 'coconut oil', 'honey', 'maple syrup', 'soy sauce', 'vinegar', 'mustard', 'ketchup',
+    'hot sauce', 'vanilla extract', 'flour', 'sugar', 'brown sugar', 'baking soda', 'baking powder',
+    
+    // Herbs & Spices
+    'basil', 'oregano', 'thyme', 'rosemary', 'sage', 'paprika', 'cumin', 'chili powder', 'black pepper',
+    'salt', 'ginger', 'turmeric', 'cinnamon', 'nutmeg', 'bay leaves', 'red pepper flakes',
+    
+    // Nuts & Seeds
+    'sunflower seeds', 'pumpkin seeds', 'cashews', 'pistachios', 'peanuts', 'pine nuts', 'chia seeds', 'flax seeds'
+  ];
+
+  // Generate random ingredients
+  const generateRandomIngredients = () => {
+    const shuffled = [...ingredientList].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 6);
+    setRandomIngredients(selected);
+  };
+
+  // Add random ingredient to main list
+  const addRandomIngredient = (ingredient) => {
+    addIngredient(ingredient);
+    // Remove from random suggestions
+    setRandomIngredients(prev => prev.filter(item => item !== ingredient));
+  };
 
   // Add ingredient (from input or detected)
   const addIngredient = (ingredient) => {
@@ -34,6 +83,7 @@ function App() {
   const clearIngredients = () => {
     setIngredients([]);
     setRecipes([]);
+    setRandomIngredients([]);
   };
 
   // Detect ingredients from image
@@ -66,6 +116,20 @@ function App() {
     setLoading(false);
   };
 
+  // Check if a recipe appears complete
+  const isRecipeComplete = (recipe) => {
+    if (!recipe || !recipe.markdown_content) return false;
+    
+    const content = recipe.markdown_content;
+    const hasTitle = content.includes('#');
+    const hasIngredients = content.toLowerCase().includes('## ingredients');
+    const hasInstructions = content.toLowerCase().includes('## instructions');
+    const hasSteps = /[1-5]\./g.test(content); // Has numbered steps
+    const hasReasonableLength = content.length > 200;
+    
+    return hasTitle && hasIngredients && hasInstructions && hasSteps && hasReasonableLength;
+  };
+
   // Get recipes from backend
   const getRecipes = async () => {
     setLoading(true);
@@ -84,7 +148,18 @@ function App() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       const data = await res.json();
-      setRecipes(data.recipes || []);
+      const recipes = data.recipes || [];
+      
+      // Validate that recipes are complete before displaying
+      const hasCompleteRecipes = recipes.length > 0 && recipes.some(isRecipeComplete);
+      
+      if (!hasCompleteRecipes && recipes.length > 0) {
+        console.warn('Received incomplete recipes, waiting a bit longer...');
+        // Add a small delay for incomplete recipes
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      setRecipes(recipes);
       setMode('afterRecipe');
     } catch (err) {
       alert(`Failed to get recipes: ${err.message}`);
@@ -99,6 +174,7 @@ function App() {
     setRecipes([]);
     setDietaryPreferences('');
     setServingSize(1);
+    setRandomIngredients([]);
     setMode('adding');
   };
 
@@ -113,13 +189,96 @@ function App() {
         <h1 className="app-title">AI Cooking Assistant</h1>
         <p className="subtitle">Discover recipes with what you have!</p>
         {(mode === 'initial' || mode === 'afterRecipe') && (
-          <button
-            className="main-new-recipe new-recipe-btn"
-            onClick={handleNewRecipe}
-            style={{ marginBottom: '1.5rem' }}
-          >
-            New Recipe
-          </button>
+          <>
+            <button
+              className="main-new-recipe new-recipe-btn"
+              onClick={handleNewRecipe}
+              style={{ marginBottom: '2rem' }}
+            >
+              New Recipe
+            </button>
+            
+            {/* Show informational content only on initial load */}
+            {mode === 'initial' && (
+              <div className="home-content">
+                {/* Why Use This App Section */}
+                <div className="info-section">
+                  <h2>🍳 Why Use AI Cooking Assistant?</h2>
+                  <div className="benefits-grid">
+                    <div className="benefit-card">
+                      <div className="benefit-icon">🥘</div>
+                      <h3>Use What You Have</h3>
+                      <p>Transform ingredients sitting in your fridge into delicious meals. No more food waste!</p>
+                    </div>
+                    <div className="benefit-card">
+                      <div className="benefit-icon">🤖</div>
+                      <h3>AI-Powered Recipes</h3>
+                      <p>Get personalized recipe suggestions powered by advanced AI technology.</p>
+                    </div>
+                    <div className="benefit-card">
+                      <div className="benefit-icon">⚡</div>
+                      <h3>Quick & Easy</h3>
+                      <p>Find recipes in seconds. Perfect for busy schedules and spontaneous cooking.</p>
+                    </div>
+                    <div className="benefit-card">
+                      <div className="benefit-icon">🍽️</div>
+                      <h3>Dietary Preferences</h3>
+                      <p>Customize recipes for your dietary needs - vegetarian, gluten-free, and more!</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* How It Works Section */}
+                <div className="info-section">
+                  <h2>📋 How It Works</h2>
+                  <div className="steps-container">
+                    <div className="step-card">
+                      <div className="step-number">1</div>
+                      <h3>Add Ingredients</h3>
+                      <p>Type in ingredients you have or take a photo to detect them automatically</p>
+                    </div>
+                    <div className="step-card">
+                      <div className="step-number">2</div>
+                      <h3>Set Preferences</h3>
+                      <p>Specify dietary preferences and number of servings</p>
+                    </div>
+                    <div className="step-card">
+                      <div className="step-number">3</div>
+                      <h3>Get Recipes</h3>
+                      <p>Receive personalized, AI-generated recipes with step-by-step instructions</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Features Section */}
+                <div className="info-section">
+                  <h2>✨ Features</h2>
+                  <div className="features-list">
+                    <div className="feature-item">
+                      <span className="feature-icon">📸</span>
+                      <strong>Image Recognition:</strong> Take photos of ingredients for automatic detection
+                    </div>
+                    <div className="feature-item">
+                      <span className="feature-icon">✅</span>
+                      <strong>Ingredient Validation:</strong> Smart validation ensures you're using real food items
+                    </div>
+                    <div className="feature-item">
+                      <span className="feature-icon">🍃</span>
+                      <strong>Dietary Options:</strong> Support for various dietary restrictions and preferences
+                    </div>
+                    <div className="feature-item">
+                      <span className="feature-icon">👥</span>
+                      <strong>Serving Sizes:</strong> Adjust recipes for 1-10 people automatically
+                    </div>
+                    <div className="feature-item">
+                      <span className="feature-icon">📱</span>
+                      <strong>Mobile Friendly:</strong> Works perfectly on all devices
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
         {mode === 'adding' && (
           <>
@@ -135,6 +294,38 @@ function App() {
                 onClear={clearIngredients}
               />
               <p className="ingredient-note">You need at least <b>4 ingredients</b> to generate recipe suggestions.</p>
+              
+              {/* Random Ingredients Section */}
+              <div className="random-ingredients-section">
+                <div className="random-header">
+                  <h3>🎲 Need inspiration?</h3>
+                  <button 
+                    className="generate-random-btn"
+                    onClick={generateRandomIngredients}
+                    type="button"
+                  >
+                    Generate Random Ingredients
+                  </button>
+                </div>
+                
+                {randomIngredients.length > 0 && (
+                  <div className="random-ingredients-grid">
+                    <p className="random-subtitle">Click any ingredient to add it to your list:</p>
+                    <div className="random-ingredients-list">
+                      {randomIngredients.map((ingredient, index) => (
+                        <button
+                          key={index}
+                          className="random-ingredient-btn"
+                          onClick={() => addRandomIngredient(ingredient)}
+                          type="button"
+                        >
+                          + {ingredient}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
               
               {/* Dietary Preferences and Serving Size Section */}
               <div className="recipe-preferences" style={{ 
@@ -216,7 +407,12 @@ function App() {
         {loading && <Loader />}
         {mode === 'afterRecipe' && (
           <>
-            <RecipeList recipes={recipes} />
+            <RecipeList 
+              recipes={recipes} 
+              originalIngredients={ingredients}
+              dietaryPreferences={dietaryPreferences}
+              servingSize={servingSize}
+            />
             <button
               className="add-ingredient-btn"
               onClick={handleAddIngredient}
