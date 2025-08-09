@@ -15,6 +15,55 @@ function App() {
   const [mode, setMode] = useState('initial'); // 'initial', 'adding', 'afterRecipe'
   const [dietaryPreferences, setDietaryPreferences] = useState(''); // New state for dietary preferences
   const [servingSize, setServingSize] = useState(1); // New state for serving size
+  const [randomIngredients, setRandomIngredients] = useState([]); // State for random ingredients
+
+  // Comprehensive list of common ingredients
+  const ingredientList = [
+    // Proteins
+    'chicken breast', 'ground beef', 'salmon', 'eggs', 'tofu', 'shrimp', 'pork chops', 'turkey', 'tuna', 'bacon',
+    'black beans', 'chickpeas', 'lentils', 'quinoa', 'greek yogurt', 'cottage cheese', 'almonds', 'walnuts',
+    
+    // Vegetables
+    'tomatoes', 'onions', 'garlic', 'bell peppers', 'mushrooms', 'spinach', 'broccoli', 'carrots', 'potatoes',
+    'sweet potatoes', 'zucchini', 'cucumber', 'lettuce', 'celery', 'corn', 'peas', 'green beans', 'asparagus',
+    'cauliflower', 'brussels sprouts', 'kale', 'cabbage', 'eggplant', 'avocado', 'cilantro', 'parsley',
+    
+    // Fruits
+    'bananas', 'apples', 'lemons', 'limes', 'oranges', 'strawberries', 'blueberries', 'grapes', 'pineapple',
+    'mango', 'papaya', 'kiwi', 'peaches', 'pears', 'cherries', 'watermelon', 'cantaloupe',
+    
+    // Grains & Starches
+    'rice', 'pasta', 'bread', 'oats', 'barley', 'couscous', 'bulgur', 'tortillas', 'crackers', 'noodles',
+    
+    // Dairy & Alternatives
+    'milk', 'cheese', 'butter', 'cream', 'sour cream', 'mozzarella', 'parmesan', 'cheddar', 'feta',
+    'coconut milk', 'almond milk', 'cream cheese',
+    
+    // Pantry Staples
+    'olive oil', 'coconut oil', 'honey', 'maple syrup', 'soy sauce', 'vinegar', 'mustard', 'ketchup',
+    'hot sauce', 'vanilla extract', 'flour', 'sugar', 'brown sugar', 'baking soda', 'baking powder',
+    
+    // Herbs & Spices
+    'basil', 'oregano', 'thyme', 'rosemary', 'sage', 'paprika', 'cumin', 'chili powder', 'black pepper',
+    'salt', 'ginger', 'turmeric', 'cinnamon', 'nutmeg', 'bay leaves', 'red pepper flakes',
+    
+    // Nuts & Seeds
+    'sunflower seeds', 'pumpkin seeds', 'cashews', 'pistachios', 'peanuts', 'pine nuts', 'chia seeds', 'flax seeds'
+  ];
+
+  // Generate random ingredients
+  const generateRandomIngredients = () => {
+    const shuffled = [...ingredientList].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, 6);
+    setRandomIngredients(selected);
+  };
+
+  // Add random ingredient to main list
+  const addRandomIngredient = (ingredient) => {
+    addIngredient(ingredient);
+    // Remove from random suggestions
+    setRandomIngredients(prev => prev.filter(item => item !== ingredient));
+  };
 
   // Add ingredient (from input or detected)
   const addIngredient = (ingredient) => {
@@ -34,6 +83,7 @@ function App() {
   const clearIngredients = () => {
     setIngredients([]);
     setRecipes([]);
+    setRandomIngredients([]);
   };
 
   // Detect ingredients from image
@@ -124,6 +174,7 @@ function App() {
     setRecipes([]);
     setDietaryPreferences('');
     setServingSize(1);
+    setRandomIngredients([]);
     setMode('adding');
   };
 
@@ -243,6 +294,38 @@ function App() {
                 onClear={clearIngredients}
               />
               <p className="ingredient-note">You need at least <b>4 ingredients</b> to generate recipe suggestions.</p>
+              
+              {/* Random Ingredients Section */}
+              <div className="random-ingredients-section">
+                <div className="random-header">
+                  <h3>🎲 Need inspiration?</h3>
+                  <button 
+                    className="generate-random-btn"
+                    onClick={generateRandomIngredients}
+                    type="button"
+                  >
+                    Generate Random Ingredients
+                  </button>
+                </div>
+                
+                {randomIngredients.length > 0 && (
+                  <div className="random-ingredients-grid">
+                    <p className="random-subtitle">Click any ingredient to add it to your list:</p>
+                    <div className="random-ingredients-list">
+                      {randomIngredients.map((ingredient, index) => (
+                        <button
+                          key={index}
+                          className="random-ingredient-btn"
+                          onClick={() => addRandomIngredient(ingredient)}
+                          type="button"
+                        >
+                          + {ingredient}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
               
               {/* Dietary Preferences and Serving Size Section */}
               <div className="recipe-preferences" style={{ 

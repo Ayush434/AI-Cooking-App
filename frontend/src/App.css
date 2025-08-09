@@ -282,6 +282,119 @@ body, html, #root {
   font-size: 0.95rem;
 }
 
+/* Random Ingredients Section */
+.random-ingredients-section {
+  width: 100%;
+  max-width: 100%;
+  margin: 1.5rem 0;
+  padding: 1.2rem;
+  background: linear-gradient(120deg, #fff8e1 60%, #ffecb3 100%);
+  border-radius: 12px;
+  border: 1px solid #ffc107;
+  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.random-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.random-header h3 {
+  margin: 0;
+  color: #f57c00;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.generate-random-btn {
+  background: linear-gradient(90deg, #ff9800 0%, #f57c00 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+  flex-shrink: 0;
+  white-space: nowrap;
+  max-width: fit-content;
+}
+
+.generate-random-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.3);
+}
+
+.generate-random-btn:active {
+  transform: scale(0.95);
+}
+
+.random-ingredients-grid {
+  margin-top: 1rem;
+}
+
+.random-subtitle {
+  margin: 0 0 0.8rem 0;
+  color: #e65100;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.random-ingredients-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.8rem;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.random-ingredient-btn {
+  background: linear-gradient(120deg, #ffffff 60%, #fff3e0 100%);
+  border: 2px solid #ff9800;
+  border-radius: 8px;
+  padding: 0.8rem 0.6rem;
+  color: #e65100;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+.random-ingredient-btn:hover {
+  background: linear-gradient(120deg, #ff9800 60%, #f57c00 100%);
+  color: white;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.25);
+}
+
+.random-ingredient-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
 /* Responsive tweaks */
 @media (max-width: 600px) {
   .app-container {
@@ -326,5 +439,27 @@ body, html, #root {
     flex-direction: column;
     text-align: center;
     gap: 0.5rem;
+  }
+  
+  .random-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.8rem;
+  }
+  
+  .random-ingredients-list {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.6rem;
+  }
+  
+  .random-ingredient-btn {
+    padding: 0.7rem 0.4rem;
+    font-size: 0.75rem;
+    min-height: 40px;
+  }
+  
+  .generate-random-btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
   }
 }
