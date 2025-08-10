@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './IngredientList.css';
+import config from '../config';
 
 function IngredientList({ ingredients, onRemove, onClear }) {
   const [validationResults, setValidationResults] = useState({});
@@ -11,7 +12,7 @@ function IngredientList({ ingredients, onRemove, onClear }) {
       
       for (const ingredient of ingredients) {
         try {
-          const response = await fetch('http://localhost:5000/api/recipes/validate-ingredient', {
+          const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.VALIDATE_INGREDIENT}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

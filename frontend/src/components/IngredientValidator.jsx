@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import './IngredientValidator.css';
+import config from '../config';
 
 const IngredientValidator = () => {
   const [ingredient, setIngredient] = useState('');
@@ -18,7 +19,7 @@ const IngredientValidator = () => {
     setValidationResult(null);
 
     try {
-      const response = await fetch('/api/recipes/validate-ingredient', {
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.VALIDATE_INGREDIENT}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

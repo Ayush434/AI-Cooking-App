@@ -10,18 +10,21 @@ import subprocess
 import sys
 import os
 
+# Configuration - update this for Cloudflare
+CLOUDFLARE_BASE_URL = 'https://hill-substantial-solaris-tie.trycloudflare.com'
+
 def test_server():
     """Test if the Flask server is running and accessible"""
     
     print("🔍 Testing Flask server...")
     
-    # Test if server is running on port 5000
+    # Test if server is running on Cloudflare
     try:
-        response = requests.get('http://localhost:5000/api/recipes/get-recipes', timeout=5)
-        print(f"✅ Server is running! Status: {response.status_code}")
+        response = requests.get(f'{CLOUDFLARE_BASE_URL}/api/recipes/get-recipes', timeout=5)
+        print(f"✅ Server is accessible via Cloudflare! Status: {response.status_code}")
         return True
     except requests.exceptions.ConnectionError:
-        print("❌ Server is not running on port 5000")
+        print("❌ Server is not accessible via Cloudflare")
         return False
     except Exception as e:
         print(f"❌ Error connecting to server: {str(e)}")
@@ -39,7 +42,7 @@ def test_api_endpoints():
         }
         
         response = requests.post(
-            'http://localhost:5000/api/recipes/get-recipes',
+            f'{CLOUDFLARE_BASE_URL}/api/recipes/get-recipes',
             json=test_data,
             headers={'Content-Type': 'application/json'},
             timeout=10
@@ -64,7 +67,7 @@ def test_api_endpoints():
         with open('test_image.txt', 'rb') as f:
             files = {'image': ('test.jpg', f, 'image/jpeg')}
             response = requests.post(
-                'http://localhost:5000/api/recipes/detect-ingredients',
+                f'{CLOUDFLARE_BASE_URL}/api/recipes/detect-ingredients',
                 files=files,
                 timeout=10
             )
