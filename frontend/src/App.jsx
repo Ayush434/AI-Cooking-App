@@ -4,6 +4,7 @@ import IngredientInput from './components/IngredientInput';
 import IngredientList from './components/IngredientList';
 import RecipeList from './components/RecipeList';
 import Loader from './components/Loader';
+import config from './config';
 
 const currentYear = new Date().getFullYear();
 
@@ -92,7 +93,7 @@ function App() {
     const formData = new FormData();
     formData.append('image', imageFile);
     try {
-      const res = await fetch('http://localhost:5000/api/recipes/detect-ingredients', {
+      const res = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.DETECT_INGREDIENTS}`, {
         method: 'POST',
         body: formData,
       });
@@ -135,7 +136,7 @@ function App() {
     setLoading(true);
     setButtonDisabled(true); // Hide button for 5 seconds
     try {
-      const res = await fetch('http://localhost:5000/api/recipes/get-recipes', {
+      const res = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.GET_RECIPES}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

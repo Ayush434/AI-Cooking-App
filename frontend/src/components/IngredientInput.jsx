@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import './IngredientInput.css';
+import config from '../config';
 
 function IngredientInput({ onAdd, onDetect, loading }) {
   const [input, setInput] = useState('');
@@ -30,7 +31,7 @@ function IngredientInput({ onAdd, onDetect, loading }) {
   const validateIngredient = async (ingredient) => {
     setValidating(true);
     try {
-      const response = await fetch('http://localhost:5000/api/recipes/validate-ingredient', {
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.VALIDATE_INGREDIENT}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -68,7 +69,7 @@ function IngredientInput({ onAdd, onDetect, loading }) {
 
   const getAutocompleteSuggestions = async (query) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/recipes/autocomplete?q=${encodeURIComponent(query)}&limit=8`);
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.AUTOCOMPLETE}?q=${encodeURIComponent(query)}&limit=8`);
       
       if (response.ok) {
         const data = await response.json();
