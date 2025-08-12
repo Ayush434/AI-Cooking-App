@@ -1,7 +1,8 @@
 // Frontend configuration
 const config = {
     // API Base URL - change this for production
-    API_BASE_URL: 'https://hill-substantial-solaris-tie.trycloudflare.com',
+    // Change this line:
+    API_BASE_URL: 'https://insertion-pain-surprising-contemporary.trycloudflare.com',
     
     // App settings
     APP_NAME: 'AI Cooking App',
