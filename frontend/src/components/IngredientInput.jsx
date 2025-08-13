@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './IngredientInput.css';
 import config from '../config';
 
@@ -10,6 +10,53 @@ function IngredientInput({ onAdd, onDetect, loading }) {
   const [suggestions, setSuggestions] = useState([]);
   const [autocompleteResults, setAutocompleteResults] = useState([]);
   const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const inputRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  // Check screen size on mount and resize
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 600);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
+  // Click outside handler for mobile
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target) && 
+          inputRef.current && !inputRef.current.contains(event.target)) {
+        setShowAutocomplete(false);
+      }
+    };
+
+    // Add touchstart for mobile devices
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
+
+  // Handle body scroll prevention on mobile when dropdown is open
+  useEffect(() => {
+    if (showAutocomplete && window.innerWidth <= 600) {
+      document.body.classList.add('dropdown-open');
+    } else {
+      document.body.classList.remove('dropdown-open');
+    }
+
+    return () => {
+      document.body.classList.remove('dropdown-open');
+    };
+  }, [showAutocomplete]);
 
   // Debounced validation and autocomplete
   useEffect(() => {
@@ -165,6 +212,7 @@ function IngredientInput({ onAdd, onDetect, loading }) {
         <div className="input-row">
           <div className="input-container">
             <input
+              ref={inputRef}
               className={`text-input ${validationResult ? (validationResult.is_valid ? 'valid' : 'invalid') : ''}`}
               value={input}
               onChange={e => setInput(e.target.value)}
@@ -177,7 +225,7 @@ function IngredientInput({ onAdd, onDetect, loading }) {
             
             {/* Autocomplete Dropdown - below input */}
             {showAutocomplete && autocompleteResults.length > 0 && (
-              <div className="autocomplete-dropdown">
+              <div ref={dropdownRef} className="autocomplete-dropdown">
                 {autocompleteResults.map((suggestion, index) => (
                   <div
                     key={index}
@@ -193,7 +241,9 @@ function IngredientInput({ onAdd, onDetect, loading }) {
               </div>
             )}
           </div>
-          <button className="add-btn" onClick={handleAdd} disabled={!input.trim()}>Add</button>
+          <button className="add-btn" onClick={handleAdd} disabled={!input.trim()}>
+            {!isMobile ? 'Add' : ''}
+          </button>
         </div>
       </div>
     </div>
