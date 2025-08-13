@@ -2,7 +2,7 @@
 const config = {
     // API Base URL - change this for production
     // Change this line:
-    API_BASE_URL: 'https://insertion-pain-surprising-contemporary.trycloudflare.com',
+    API_BASE_URL: 'https://handheld-massive-acceptance-arrivals.trycloudflare.com',
     
     // App settings
     APP_NAME: 'AI Cooking App',
