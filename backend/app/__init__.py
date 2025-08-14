@@ -2,11 +2,15 @@ import os
 import atexit
 from flask import Flask
 from flask_cors import CORS
+from dotenv import load_dotenv
 from .config import config
 from .database import init_db, cleanup_connector
 
 def create_app(config_name=None):
     """Create and configure Flask application"""
+    
+    # Load environment variables from .env file
+    load_dotenv()
     
     if config_name is None:
         config_name = os.environ.get('FLASK_ENV', 'development')

@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import NutritionFacts from './NutritionFacts';
 import './RecipeList.css';
 
 function RecipeList({ recipes, originalIngredients, dietaryPreferences, servingSize }) {
+  const [showNutrition, setShowNutrition] = useState(false);
+  const [nutritionLoading, setNutritionLoading] = useState(false);
+  
   if (!recipes.length) return null;
   
   // Check if any recipes appear incomplete
@@ -17,6 +21,56 @@ function RecipeList({ recipes, originalIngredients, dietaryPreferences, servingS
   const hasIncompleteRecipes = recipes.some(recipe => 
     !recipe.is_error && !checkRecipeCompleteness(recipe)
   );
+
+  // Extract ingredients from AI-generated recipe content
+  const extractRecipeIngredients = () => {
+    if (!recipes || recipes.length === 0) return [];
+    
+    // Try to find ingredients from the first complete recipe
+    const completeRecipe = recipes.find(recipe => 
+      !recipe.is_error && checkRecipeCompleteness(recipe)
+    );
+    
+    if (completeRecipe) {
+      // Try to extract ingredients from markdown content
+      if (completeRecipe.markdown_content) {
+        const content = completeRecipe.markdown_content;
+        const ingredientsMatch = content.match(/## ingredients\s*\n([\s\S]*?)(?=##|$)/i);
+        
+        if (ingredientsMatch) {
+          const ingredientsText = ingredientsMatch[1].trim();
+          // Parse ingredients list (remove bullets, numbers, etc.)
+          const ingredients = ingredientsText
+            .split('\n')
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            .map(line => {
+              // Remove common list markers and extra whitespace
+              return line.replace(/^[-*•\d\.\s]+/, '').trim();
+            })
+            .filter(ingredient => ingredient.length > 0);
+          
+          if (ingredients.length > 0) {
+            return ingredients;
+          }
+        }
+      }
+      
+      // Fallback to old format ingredients
+      if (completeRecipe.ingredients && completeRecipe.ingredients.length > 0) {
+        return completeRecipe.ingredients;
+      }
+    }
+    
+    // If no recipe ingredients found, fall back to original ingredients
+    return originalIngredients || [];
+  };
+
+  const recipeIngredients = extractRecipeIngredients();
+  
+  // Log extracted ingredients for debugging
+  console.log('Original user ingredients:', originalIngredients);
+  console.log('AI-generated recipe ingredients:', recipeIngredients);
   
   return (
     <div className="recipes-list-card">
@@ -91,6 +145,29 @@ function RecipeList({ recipes, originalIngredients, dietaryPreferences, servingS
         ))}
       </div>
       
+      {/* Nutrition Facts Button */}
+      <div className="nutrition-section">
+        <button
+          className={`nutrition-facts-btn ${nutritionLoading ? 'loading' : ''}`}
+          onClick={() => setShowNutrition(true)}
+          disabled={nutritionLoading}
+        >
+          {nutritionLoading ? (
+            <>
+              <div className="btn-spinner"></div>
+              Calculating...
+            </>
+          ) : (
+            recipeIngredients.length > 0 && recipeIngredients !== originalIngredients
+              ? '🍎 View Nutrition Facts (AI Recipe)'
+              : '🍎 View Nutrition Facts (User Ingredients)'
+          )}
+        </button>
+        <p className="nutrition-note">
+          Get detailed nutritional information based on the AI-generated recipe ingredients and serving size
+        </p>
+      </div>
+      
       {/* AI Disclaimer */}
       <div className="ai-disclaimer">
         <p>
@@ -99,6 +176,15 @@ function RecipeList({ recipes, originalIngredients, dietaryPreferences, servingS
           and adjust cooking times/temperatures as needed based on your equipment and preferences.
         </p>
       </div>
+      
+      {/* Nutrition Facts Modal */}
+      <NutritionFacts
+        ingredients={recipeIngredients}
+        servingSize={servingSize}
+        isVisible={showNutrition}
+        onClose={() => setShowNutrition(false)}
+        onLoadingChange={setNutritionLoading}
+      />
     </div>
   );
 }
