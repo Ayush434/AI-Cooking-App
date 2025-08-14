@@ -12,6 +12,12 @@ def get_database_url():
     database_name = os.environ.get('CLOUD_SQL_DATABASE_NAME', 'ai_cooking_app')
     username = os.environ.get('CLOUD_SQL_USERNAME', 'postgres')
     
+    # Debug: Print environment variables
+    print(f"Environment variables loaded:")
+    print(f"  CALORIE_NINJAS_API_KEY: {'SET' if os.environ.get('CALORIE_NINJAS_API_KEY') else 'NOT SET'}")
+    print(f"  DATABASE_URL: {'SET' if local_db_url else 'NOT SET'}")
+    print(f"  CLOUD_SQL_PROJECT_ID: {'SET' if project_id else 'NOT SET'}")
+    
     # If running in local development with a local database
     if local_db_url:
         return local_db_url
@@ -50,6 +56,13 @@ class Config:
     
     # Local development database (fallback)
     LOCAL_DATABASE_URL = os.environ.get('DATABASE_URL')
+    
+    # CalorieNinjas API Configuration
+    CALORIE_NINJAS_API_KEY = os.environ.get('CALORIE_NINJAS_API_KEY')
+    CALORIE_NINJAS_BASE_URL = 'https://api.calorieninjas.com/v1/nutrition'
+    
+    # AI Service API Keys
+    HF_ACCESS_TOKEN = os.environ.get('HF_ACCESS_TOKEN')
     
     # SQLAlchemy Configuration
     SQLALCHEMY_DATABASE_URI = get_database_url()

@@ -12,14 +12,32 @@ vision_service = VisionService()
 recipe_service = RecipeService()
 food_validation_service = FoodValidationService()
 
+# Lazy initialization of nutrition service to avoid startup failures
+def get_nutrition_service():
+    try:
+        from ..services.nutrition_service import NutritionService
+        return NutritionService()
+    except Exception as e:
+        print(f"Warning: Nutrition service not available: {e}")
+        return None
+
 @recipes_bp.route('/health', methods=['GET'])
 def health_check():
     """
     Simple health check endpoint
     """
+    # Check nutrition service availability
+    nutrition_service_available = get_nutrition_service() is not None
+    
     return jsonify({
         'status': 'healthy',
         'message': 'API is working correctly',
+        'services': {
+            'vision': True,
+            'recipe': True,
+            'food_validation': True,
+            'nutrition': nutrition_service_available
+        },
         'endpoints': [
             '/api/recipes/health',
             '/api/recipes/detect-ingredients',
@@ -27,7 +45,8 @@ def health_check():
             '/api/recipes/validate-ingredient',
             '/api/recipes/validate-ingredients',
             '/api/recipes/autocomplete',
-            '/api/recipes/search-ingredients'
+            '/api/recipes/search-ingredients',
+            '/api/recipes/nutrition-facts'
         ]
     })
 
@@ -229,5 +248,49 @@ def search_ingredients():
         print(f"Error in search_ingredients: {str(e)}")
         return jsonify({
             'error': 'Search service error',
+            'message': str(e)
+        }), 500
+
+@recipes_bp.route('/nutrition-facts', methods=['POST'])
+def get_nutrition_facts():
+    """
+    Get nutrition facts for a list of ingredients
+    """
+    try:
+        data = request.get_json()
+        if not data or 'ingredients' not in data:
+            return jsonify({'error': 'No ingredients provided'}), 400
+        
+        ingredients = data.get('ingredients', [])
+        serving_size = data.get('serving_size', 1)
+        
+        if not ingredients:
+            return jsonify({'error': 'Empty ingredients list'}), 400
+        
+        # Validate ingredients before making API call
+        valid_ingredients = [ingredient for ingredient in ingredients if ingredient and ingredient.strip()]
+        
+        if len(valid_ingredients) == 0:
+            return jsonify({'error': 'No valid ingredients found for nutrition calculation'}), 400
+        
+        # Get nutrition facts from CalorieNinjas API
+        nutrition_service = get_nutrition_service()
+        if not nutrition_service:
+            return jsonify({
+                'error': 'Nutrition service not available',
+                'message': 'Nutrition facts cannot be retrieved due to missing API key.'
+            }), 503
+
+        nutrition_data = nutrition_service.get_nutrition_facts(valid_ingredients, serving_size)
+        
+        return jsonify({
+            'nutrition_data': nutrition_data,
+            'message': f'Retrieved nutrition facts for {len(valid_ingredients)} ingredients'
+        })
+        
+    except Exception as e:
+        print(f"Error in get_nutrition_facts: {str(e)}")
+        return jsonify({
+            'error': 'Nutrition service error',
             'message': str(e)
         }), 500
