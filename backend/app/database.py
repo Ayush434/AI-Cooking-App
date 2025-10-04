@@ -40,16 +40,27 @@ def setup_cloud_sql_connector(app):
     username = os.environ.get('CLOUD_SQL_USERNAME', 'postgres')
     password = os.environ.get('CLOUD_SQL_PASSWORD')
     
+    print(f"Setting up Cloud SQL connector:")
+    print(f"  Project ID: {project_id}")
+    print(f"  Region: {region}")
+    print(f"  Instance: {instance_name}")
+    print(f"  Database: {database_name}")
+    print(f"  Username: {username}")
+    print(f"  Password: {'SET' if password else 'NOT SET'}")
+    
     # Don't set up connector in production environments (they use unix sockets)
     if os.environ.get('GAE_ENV') or os.environ.get('CLOUD_RUN_SERVICE'):
+        print("Skipping Cloud SQL connector setup - running in production environment")
         return
     
     try:
         # Initialize Connector object
+        print("Initializing Cloud SQL Connector...")
         connector = Connector()
         
         # Function to return the database connection
         def getconn():
+            print(f"Creating connection to {project_id}:{region}:{instance_name}")
             conn = connector.connect(
                 f"{project_id}:{region}:{instance_name}",
                 "pg8000",
@@ -57,19 +68,11 @@ def setup_cloud_sql_connector(app):
                 password=password,
                 db=database_name,
             )
+            print("Connection established successfully")
             return conn
         
-        # Create connection pool
-        pool = sqlalchemy.create_engine(
-            "postgresql+pg8000://",
-            creator=getconn,
-            pool_size=5,
-            max_overflow=2,
-            pool_pre_ping=True,
-            pool_recycle=300,
-        )
-        
-        # Create a custom engine with the connector
+        # Create SQLAlchemy engine with the connector
+        print("Creating SQLAlchemy engine...")
         engine = sqlalchemy.create_engine(
             "postgresql+pg8000://",
             creator=getconn,
@@ -79,17 +82,31 @@ def setup_cloud_sql_connector(app):
             pool_recycle=300,
         )
         
-        # Update the database URI to use the pool
+        # Test the connection
+        print("Testing database connection...")
+        with engine.connect() as conn:
+            result = conn.execute(sqlalchemy.text("SELECT 1"))
+            print("Database connection test successful!")
+        
+        # Update Flask-SQLAlchemy to use our custom engine
+        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+            'creator': getconn,
+            'pool_size': 5,
+            'max_overflow': 2,
+            'pool_pre_ping': True,
+            'pool_recycle': 300,
+        }
         app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+pg8000://"
         
-        logging.info(f"Connected to Cloud SQL instance: {project_id}:{region}:{instance_name}")
-        
-        # Store connector for cleanup
+        # Store the engine and connector for Flask-SQLAlchemy
+        app.cloud_sql_engine = engine
         app.cloud_sql_connector = connector
         
+        print(f"✅ Successfully connected to Cloud SQL instance: {project_id}:{region}:{instance_name}")
+        
     except Exception as e:
-        logging.error(f"Failed to connect to Cloud SQL: {e}")
-        logging.info("Falling back to local SQLite database")
+        print(f"❌ Failed to connect to Cloud SQL: {e}")
+        print("Falling back to local SQLite database")
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ai_cooking_app.db'
 
 def cleanup_connector(app):
