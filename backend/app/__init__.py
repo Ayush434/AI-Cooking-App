@@ -2,6 +2,7 @@ import os
 import atexit
 from flask import Flask
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from dotenv import load_dotenv
 from .config import config
 from .database import init_db, cleanup_connector
@@ -23,6 +24,9 @@ def create_app(config_name=None):
     # Initialize CORS
     CORS(app)
     
+    # Initialize JWT
+    jwt = JWTManager(app)
+    
     # Initialize database
     init_db(app)
     
@@ -31,7 +35,9 @@ def create_app(config_name=None):
     
     # Register Blueprints
     from .routes.recipes import recipes_bp
+    from .routes.auth import auth_bp
     app.register_blueprint(recipes_bp, url_prefix="/api/recipes")
+    app.register_blueprint(auth_bp)
 
     return app
 

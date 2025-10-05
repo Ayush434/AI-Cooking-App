@@ -13,13 +13,13 @@ body, html, #root {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 2vw;
+  justify-content: flex-start;
+  padding: 0;
 }
 .app-container {
   width: 100%;
   max-width: 540px;
-  margin: 2rem auto;
+  margin: 1rem auto;
   background: #f8f7ff;
   border-radius: 28px;
   box-shadow: 0 6px 36px rgba(108,99,255,0.13);
@@ -32,6 +32,7 @@ body, html, #root {
   /* Center horizontally */
   margin-left: auto;
   margin-right: auto;
+  margin-top: 2rem;
 }
 .app-title {
   font-size: 2.2rem;
@@ -46,6 +47,19 @@ body, html, #root {
   font-size: 1.1rem;
   text-align: center;
   margin-bottom: 1.5rem;
+}
+
+/* App Header Styles */
+.app-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.app-title-section {
+  text-align: center;
 }
 .get-recipes-btn {
   background: linear-gradient(90deg, #48c6ef 0%, #6c63ff 100%);
@@ -114,6 +128,30 @@ body, html, #root {
   background: none;
   width: 100%;
   margin-top: auto;
+}
+
+/* Home page New Recipe button styling */
+.home-new-recipe {
+  background: linear-gradient(90deg, #48c6ef 0%, #6c63ff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 1.2rem 2.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3);
+  margin-bottom: 2rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+}
+
+.home-new-recipe:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
 }
 .ingredient-note {
   color: #6c63ff;

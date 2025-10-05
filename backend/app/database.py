@@ -12,13 +12,14 @@ migrate = Migrate()
 def init_db(app):
     """Initialize database with Flask app"""
     
-    # Configure SQLAlchemy
-    db.init_app(app)
-    migrate.init_app(app, db)
-    
     # Set up Cloud SQL Connector if using Cloud SQL
     if should_use_cloud_sql():
         setup_cloud_sql_connector(app)
+    else:
+        # Configure SQLAlchemy normally for SQLite
+        db.init_app(app)
+    
+    migrate.init_app(app, db)
     
     return db
 
@@ -98,14 +99,17 @@ def setup_cloud_sql_connector(app):
         }
         app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql+pg8000://"
         
+        # Re-initialize SQLAlchemy with the new configuration
+        db.init_app(app)
+        
         # Store the engine and connector for Flask-SQLAlchemy
         app.cloud_sql_engine = engine
         app.cloud_sql_connector = connector
         
-        print(f"✅ Successfully connected to Cloud SQL instance: {project_id}:{region}:{instance_name}")
+        print(f"Successfully connected to Cloud SQL instance: {project_id}:{region}:{instance_name}")
         
     except Exception as e:
-        print(f"❌ Failed to connect to Cloud SQL: {e}")
+        print(f"Failed to connect to Cloud SQL: {e}")
         print("Falling back to local SQLite database")
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ai_cooking_app.db'
 
