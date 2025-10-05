@@ -1,22 +1,92 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import IngredientInput from './components/IngredientInput';
 import IngredientList from './components/IngredientList';
 import RecipeList from './components/RecipeList';
 import Loader from './components/Loader';
+import AuthModal from './components/AuthModal';
+import Navbar from './components/Navbar';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import config from './config';
 
 const currentYear = new Date().getFullYear();
 
-function App() {
-  const [ingredients, setIngredients] = useState([]);
-  const [recipes, setRecipes] = useState([]);
+function AppContent() {
+  // Load state from localStorage on component mount
+  const [ingredients, setIngredients] = useState(() => {
+    const saved = localStorage.getItem('app_ingredients');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [recipes, setRecipes] = useState(() => {
+    const saved = localStorage.getItem('app_recipes');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [loading, setLoading] = useState(false);
   const [buttonDisabled, setButtonDisabled] = useState(false); // For hiding get recipe button
-  const [mode, setMode] = useState('initial'); // 'initial', 'adding', 'afterRecipe'
-  const [dietaryPreferences, setDietaryPreferences] = useState(''); // New state for dietary preferences
-  const [servingSize, setServingSize] = useState(1); // New state for serving size
-  const [randomIngredients, setRandomIngredients] = useState([]); // State for random ingredients
+  const [mode, setMode] = useState(() => {
+    const saved = localStorage.getItem('app_mode');
+    return saved || 'initial';
+  }); // 'initial', 'adding', 'afterRecipe'
+  const [dietaryPreferences, setDietaryPreferences] = useState(() => {
+    const saved = localStorage.getItem('app_dietary_preferences');
+    return saved || '';
+  }); // New state for dietary preferences
+  const [servingSize, setServingSize] = useState(() => {
+    const saved = localStorage.getItem('app_serving_size');
+    return saved ? parseInt(saved) : 1;
+  }); // New state for serving size
+  const [randomIngredients, setRandomIngredients] = useState(() => {
+    const saved = localStorage.getItem('app_random_ingredients');
+    return saved ? JSON.parse(saved) : [];
+  }); // State for random ingredients
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login'); // 'login', 'register', 'profile'
+  
+  const { user, loading: authLoading, getAuthHeaders } = useAuth();
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('app_ingredients', JSON.stringify(ingredients));
+  }, [ingredients]);
+
+  useEffect(() => {
+    localStorage.setItem('app_recipes', JSON.stringify(recipes));
+  }, [recipes]);
+
+  useEffect(() => {
+    localStorage.setItem('app_mode', mode);
+  }, [mode]);
+
+  useEffect(() => {
+    localStorage.setItem('app_dietary_preferences', dietaryPreferences);
+  }, [dietaryPreferences]);
+
+  useEffect(() => {
+    localStorage.setItem('app_serving_size', servingSize.toString());
+  }, [servingSize]);
+
+  useEffect(() => {
+    localStorage.setItem('app_random_ingredients', JSON.stringify(randomIngredients));
+  }, [randomIngredients]);
+
+  // Auth functions
+  const openAuthModal = (mode = 'login') => {
+    setAuthMode(mode);
+    setAuthModalOpen(true);
+  };
+
+  const closeAuthModal = () => {
+    setAuthModalOpen(false);
+  };
+
+  // Navigation functions
+  const goHome = () => {
+    setMode('initial');
+    // Scroll to top smoothly
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 100);
+  };
 
   // Comprehensive list of common ingredients
   const ingredientList = [
@@ -85,6 +155,25 @@ function App() {
     setIngredients([]);
     setRecipes([]);
     setRandomIngredients([]);
+    setDietaryPreferences('');
+    setServingSize(1);
+    setMode('initial');
+  };
+
+  // Clear all app state (for logout or complete reset)
+  const clearAllAppState = () => {
+    localStorage.removeItem('app_ingredients');
+    localStorage.removeItem('app_recipes');
+    localStorage.removeItem('app_mode');
+    localStorage.removeItem('app_dietary_preferences');
+    localStorage.removeItem('app_serving_size');
+    localStorage.removeItem('app_random_ingredients');
+    setIngredients([]);
+    setRecipes([]);
+    setMode('initial');
+    setDietaryPreferences('');
+    setServingSize(1);
+    setRandomIngredients([]);
   };
 
   // Detect ingredients from image
@@ -136,9 +225,14 @@ function App() {
     setLoading(true);
     setButtonDisabled(true); // Hide button for 5 seconds
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+        ...getAuthHeaders()
+      };
+      
       const res = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.GET_RECIPES}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ 
           ingredients,
           dietary_preferences: dietaryPreferences.trim(),
@@ -186,13 +280,26 @@ function App() {
 
   return (
     <div className="main-bg">
+      {/* Navigation Bar */}
+      <Navbar 
+        onNewRecipe={handleNewRecipe}
+        onOpenAuthModal={openAuthModal}
+        onGoHome={goHome}
+        currentMode={mode}
+      />
+      
       <div className="app-container">
-        <h1 className="app-title">AI Cooking Assistant</h1>
-        <p className="subtitle">Discover recipes with what you have!</p>
+        {/* Main Content Header */}
+        <div className="app-header">
+          <div className="app-title-section">
+            <h1 className="app-title">SnackHack</h1>
+            <p className="subtitle">Discover recipes with what you have!</p>
+          </div>
+        </div>
         {(mode === 'initial' || mode === 'afterRecipe') && (
           <>
             <button
-              className="main-new-recipe new-recipe-btn"
+              className="main-new-recipe new-recipe-btn home-new-recipe"
               onClick={handleNewRecipe}
               style={{ marginBottom: '2rem' }}
             >
@@ -423,11 +530,24 @@ function App() {
             </button>
           </>
         )}
+        
+        <AuthModal
+          isOpen={authModalOpen}
+          onClose={closeAuthModal}
+        />
       </div>
       <footer className="footer">
         &copy; {currentYear} Ayush Mehta
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

@@ -22,7 +22,7 @@ def get_database_url():
     if local_db_url:
         return local_db_url
     
-    # If all Cloud SQL parameters are available
+    # If all Cloud SQL parameters are available, use Cloud SQL
     if all([project_id, password]):
         # For Google Cloud SQL with private IP (Cloud Run, GKE, etc.)
         if os.environ.get('GAE_ENV') or os.environ.get('CLOUD_RUN_SERVICE'):
@@ -31,11 +31,10 @@ def get_database_url():
                 f"@/{database_name}?"
                 f"host=/cloudsql/{project_id}:{region}:{instance_name}"
             )
-        
-        # For local development connecting to Cloud SQL via Cloud SQL Proxy or public IP
+        # For local development connecting to Cloud SQL via Cloud SQL Connector
         else:
-            # This will be set up with the Cloud SQL Connector
-            return "postgresql+psycopg2://placeholder"
+            print("Using Google Cloud SQL for local development")
+            return "postgresql+pg8000://"
     
     # Fallback to SQLite for development
     return 'sqlite:///ai_cooking_app.db'
@@ -45,6 +44,11 @@ class Config:
     
     # Basic Flask config
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
+    
+    # JWT Configuration
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or SECRET_KEY
+    JWT_ACCESS_TOKEN_EXPIRES = 3600  # 1 hour
+    JWT_REFRESH_TOKEN_EXPIRES = 604800  # 7 days
     
     # Google Cloud SQL Configuration
     CLOUD_SQL_PROJECT_ID = os.environ.get('CLOUD_SQL_PROJECT_ID')
