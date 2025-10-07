@@ -38,6 +38,11 @@ def create_app(config_name=None):
     from .routes.auth import auth_bp
     app.register_blueprint(recipes_bp, url_prefix="/api/recipes")
     app.register_blueprint(auth_bp)
+    
+    # Simple health check endpoint
+    @app.route('/health', methods=['GET'])
+    def health():
+        return {'status': 'healthy', 'message': 'SnackHack API is running'}
 
     return app
 

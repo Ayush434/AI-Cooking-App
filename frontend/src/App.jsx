@@ -44,6 +44,32 @@ function AppContent() {
   
   const { user, loading: authLoading, getAuthHeaders } = useAuth();
 
+  // Keep-alive ping to prevent server spin-down
+  useEffect(() => {
+    const pingServer = async () => {
+      try {
+        await fetch(`${config.API_BASE_URL}/health`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        console.log('Server ping successful');
+      } catch (error) {
+        console.log('Server ping failed:', error.message);
+      }
+    };
+
+    // Ping immediately
+    pingServer();
+
+    // Set up interval to ping every 2 minutes (120000ms)
+    const pingInterval = setInterval(pingServer, 120000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(pingInterval);
+  }, []);
+
   // Save state to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('app_ingredients', JSON.stringify(ingredients));
