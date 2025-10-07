@@ -1,0 +1,15 @@
+name: Keep Server Alive
+
+on:
+  schedule:
+    # Run every 2 minutes
+    - cron: '*/2 * * * *'
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Server
+        run: |
+          curl -f https://ai-cooking-app.onrender.com/health || echo "Ping failed"
