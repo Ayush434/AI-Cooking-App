@@ -2,14 +2,23 @@ name: Keep Server Alive
 
 on:
   schedule:
-    # Run every 2 minutes
-    - cron: '*/2 * * * *'
+    # Run every 5 minutes (GitHub's minimum for cron)
+    - cron: '*/5 * * * *'
+    # Additional ping every 10 minutes for redundancy
+    - cron: '*/10 * * * *'
   workflow_dispatch: # Allow manual trigger
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug Info
+        run: |
+          echo "Current time: $(date)"
+          echo "GitHub Actions is working"
+      
       - name: Ping Server
         run: |
+          echo "Pinging server..."
           curl -f https://ai-cooking-app.onrender.com/health || echo "Ping failed"
+          echo "Ping completed at: $(date)"
