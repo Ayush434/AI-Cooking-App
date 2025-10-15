@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Login from './Login';
 import Register from './Register';
-import UserProfile from './UserProfile';
+import ProfileSettings from './ProfileSettings';
 import { useAuth } from '../contexts/AuthContext';
 
-const AuthModal = ({ isOpen, onClose }) => {
-  const [authMode, setAuthMode] = useState('login'); // 'login', 'register', 'profile'
+const AuthModal = ({ isOpen, onClose, authMode: initialAuthMode = 'login' }) => {
+  const [authMode, setAuthMode] = useState(initialAuthMode); // 'login', 'register', 'profile'
   const { user, login, register, logout, updateProfile, authLoading } = useAuth();
+
+  // Update authMode when prop changes
+  useEffect(() => {
+    setAuthMode(initialAuthMode);
+  }, [initialAuthMode]);
 
   const handleLogin = async (credentials) => {
     try {
@@ -53,7 +58,7 @@ const AuthModal = ({ isOpen, onClose }) => {
           <h2>
             {authMode === 'login' && 'Sign In'}
             {authMode === 'register' && 'Create Account'}
-            {authMode === 'profile' && 'User Profile'}
+            {authMode === 'profile' && 'Profile Settings'}
           </h2>
           <button className="auth-modal-close" onClick={onClose}>
             ×
@@ -78,7 +83,7 @@ const AuthModal = ({ isOpen, onClose }) => {
           )}
 
           {authMode === 'profile' && user && (
-            <UserProfile
+            <ProfileSettings
               user={user}
               onUpdateProfile={handleUpdateProfile}
               onLogout={handleLogout}

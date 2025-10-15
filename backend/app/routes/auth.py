@@ -125,18 +125,26 @@ def update_profile():
         if not data:
             return jsonify({'error': 'No data provided'}), 400
         
-        # Extract allowed fields for update
-        update_data = {}
-        allowed_fields = ['dietary_preferences', 'allergies', 'favorite_cuisines']
-        
-        for field in allowed_fields:
-            if field in data:
-                update_data[field] = data[field]
-        
-        if not update_data:
-            return jsonify({'error': 'No valid fields to update'}), 400
-        
-        success, message, user = AuthService.update_user_profile(user_id, **update_data)
+        # Check if this is a password change request
+        if 'current_password' in data and 'new_password' in data:
+            success, message, user = AuthService.change_password(
+                user_id, 
+                data['current_password'], 
+                data['new_password']
+            )
+        else:
+            # Extract allowed fields for update
+            update_data = {}
+            allowed_fields = ['username', 'email', 'dietary_preferences', 'allergies', 'favorite_cuisines']
+            
+            for field in allowed_fields:
+                if field in data:
+                    update_data[field] = data[field]
+            
+            if not update_data:
+                return jsonify({'error': 'No valid fields to update'}), 400
+            
+            success, message, user = AuthService.update_user_profile(user_id, **update_data)
         
         if success:
             return jsonify({

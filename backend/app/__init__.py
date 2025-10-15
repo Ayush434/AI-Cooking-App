@@ -27,6 +27,22 @@ def create_app(config_name=None):
     # Initialize JWT
     jwt = JWTManager(app)
     
+    # Configure JWT to handle user identity properly
+    @jwt.user_identity_loader
+    def user_identity_lookup(user):
+        return user.id if hasattr(user, 'id') else str(user)
+    
+    @jwt.user_lookup_loader
+    def user_lookup_callback(_jwt_header, jwt_data):
+        identity = jwt_data["sub"]
+        from .models.user import User
+        # Convert identity to integer since user.id is an integer column
+        try:
+            user_id = int(identity)
+            return User.query.filter_by(id=user_id).one_or_none()
+        except (ValueError, TypeError):
+            return None
+    
     # Initialize database
     init_db(app)
     

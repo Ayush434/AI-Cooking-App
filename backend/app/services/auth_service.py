@@ -132,12 +132,12 @@ class AuthService:
         try:
             user = User.query.get(user_id)
             if not user:
-                return False, "User not found"
+                return False, "User not found", None
             
             return True, "User found", user
             
         except Exception as e:
-            return False, f"Failed to get user: {str(e)}"
+            return False, f"Failed to get user: {str(e)}", None
     
     @staticmethod
     def update_user_profile(user_id, **kwargs):
@@ -145,12 +145,23 @@ class AuthService:
         try:
             user = User.query.get(user_id)
             if not user:
-                return False, "User not found"
+                return False, "User not found", None
             
             # Update allowed fields
-            allowed_fields = ['dietary_preferences', 'allergies', 'favorite_cuisines']
+            allowed_fields = ['username', 'email', 'dietary_preferences', 'allergies', 'favorite_cuisines']
+            
             for field, value in kwargs.items():
                 if field in allowed_fields and hasattr(user, field):
+                    # Check for username/email uniqueness
+                    if field == 'username' and value != user.username:
+                        if User.query.filter_by(username=value).first():
+                            return False, "Username already taken", None
+                    elif field == 'email' and value != user.email:
+                        if not AuthService.validate_email(value):
+                            return False, "Invalid email format", None
+                        if User.query.filter_by(email=value).first():
+                            return False, "Email already registered", None
+                    
                     setattr(user, field, value)
             
             user.updated_at = datetime.utcnow()
@@ -160,4 +171,32 @@ class AuthService:
             
         except Exception as e:
             db.session.rollback()
-            return False, f"Profile update failed: {str(e)}"
+            return False, f"Profile update failed: {str(e)}", None
+    
+    @staticmethod
+    def change_password(user_id, current_password, new_password):
+        """Change user password"""
+        try:
+            user = User.query.get(user_id)
+            if not user:
+                return False, "User not found", None
+            
+            # Verify current password
+            if not user.check_password(current_password):
+                return False, "Current password is incorrect", None
+            
+            # Validate new password
+            is_valid, message = AuthService.validate_password(new_password)
+            if not is_valid:
+                return False, message, None
+            
+            # Set new password
+            user.set_password(new_password)
+            user.updated_at = datetime.utcnow()
+            db.session.commit()
+            
+            return True, "Password changed successfully", user
+            
+        except Exception as e:
+            db.session.rollback()
+            return False, f"Password change failed: {str(e)}", None

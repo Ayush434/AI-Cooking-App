@@ -560,6 +560,7 @@ function AppContent() {
         <AuthModal
           isOpen={authModalOpen}
           onClose={closeAuthModal}
+          authMode={authMode}
         />
       </div>
       <footer className="footer">
