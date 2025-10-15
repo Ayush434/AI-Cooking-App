@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import './Navbar.css';
 
 const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, currentMode }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   const handleHomeClick = () => {
     // Scroll to top and reset to home state
@@ -17,11 +19,35 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, currentMode }) => {
 
   const handleAuthClick = () => {
     if (isAuthenticated) {
-      onOpenAuthModal('profile');
+      setDropdownOpen(!dropdownOpen);
     } else {
       onOpenAuthModal('login');
     }
   };
+
+  const handleLogout = () => {
+    logout();
+    setDropdownOpen(false);
+  };
+
+  const handleProfileClick = () => {
+    onOpenAuthModal('profile');
+    setDropdownOpen(false);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="navbar">
@@ -47,20 +73,39 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, currentMode }) => {
             ➕ New Recipe
           </button>
           
-          <button 
-            className="nav-link auth-link"
-            onClick={handleAuthClick}
-          >
-            {isAuthenticated ? (
-              <>
-                👤 {user?.username}
-              </>
-            ) : (
-              <>
-                🔐 Sign In
-              </>
+          <div className="dropdown-container" ref={dropdownRef}>
+            <button 
+              className="nav-link auth-link"
+              onClick={handleAuthClick}
+            >
+              {isAuthenticated ? (
+                <>
+                  👤 {user?.username} {dropdownOpen ? '▲' : '▼'}
+                </>
+              ) : (
+                <>
+                  🔐 Sign In
+                </>
+              )}
+            </button>
+            
+            {isAuthenticated && dropdownOpen && (
+              <div className="dropdown-menu">
+                <button 
+                  className="dropdown-item"
+                  onClick={handleProfileClick}
+                >
+                  ⚙️ Profile Settings
+                </button>
+                <button 
+                  className="dropdown-item logout-item"
+                  onClick={handleLogout}
+                >
+                  🚪 Logout
+                </button>
+              </div>
             )}
-          </button>
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
