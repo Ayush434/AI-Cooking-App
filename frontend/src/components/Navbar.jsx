@@ -5,6 +5,7 @@ import './Navbar.css';
 const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, currentMode }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const handleHomeClick = () => {
@@ -33,13 +34,38 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, currentMode }) => {
   const handleProfileClick = () => {
     onOpenAuthModal('profile');
     setDropdownOpen(false);
+    setMobileMenuOpen(false);
   };
 
-  // Close dropdown when clicking outside
+  const handleMobileMenuToggle = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+    setDropdownOpen(false);
+  };
+
+  const handleMobileAuthClick = () => {
+    if (isAuthenticated) {
+      onOpenAuthModal('profile');
+    } else {
+      onOpenAuthModal('login');
+    }
+    setMobileMenuOpen(false);
+  };
+
+  const handleMobileLogout = () => {
+    logout();
+    setMobileMenuOpen(false);
+  };
+
+  // Close dropdown and mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
+      }
+      
+      // Close mobile menu when clicking outside
+      if (mobileMenuOpen && !event.target.closest('.navbar')) {
+        setMobileMenuOpen(false);
       }
     };
 
@@ -47,7 +73,7 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, currentMode }) => {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [mobileMenuOpen]);
 
   return (
     <nav className="navbar">
@@ -110,11 +136,65 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, currentMode }) => {
 
         {/* Mobile Menu Button */}
         <div className="navbar-mobile">
-          <button className="mobile-menu-btn">
-            ☰
+          <button 
+            className="mobile-menu-btn"
+            onClick={handleMobileMenuToggle}
+          >
+            {mobileMenuOpen ? '✕' : '☰'}
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="mobile-menu">
+          <div className="mobile-menu-content">
+            <button 
+              className={`mobile-nav-link ${currentMode === 'initial' ? 'active' : ''}`}
+              onClick={() => {
+                handleHomeClick();
+                setMobileMenuOpen(false);
+              }}
+            >
+              🏠 Home
+            </button>
+            
+            <button 
+              className={`mobile-nav-link ${currentMode === 'adding' ? 'active' : ''}`}
+              onClick={() => {
+                handleNewRecipeClick();
+                setMobileMenuOpen(false);
+              }}
+            >
+              ➕ New Recipe
+            </button>
+            
+            {isAuthenticated ? (
+              <>
+                <button 
+                  className="mobile-nav-link"
+                  onClick={handleMobileAuthClick}
+                >
+                  👤 {user?.username}
+                </button>
+                <button 
+                  className="mobile-nav-link logout-link"
+                  onClick={handleMobileLogout}
+                >
+                  🚪 Logout
+                </button>
+              </>
+            ) : (
+              <button 
+                className="mobile-nav-link"
+                onClick={handleMobileAuthClick}
+              >
+                🔐 Sign In
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
