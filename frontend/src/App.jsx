@@ -183,7 +183,6 @@ function AppContent() {
     setRandomIngredients([]);
     setDietaryPreferences('');
     setServingSize(1);
-    setMode('initial');
   };
 
   // Clear all app state (for logout or complete reset)
