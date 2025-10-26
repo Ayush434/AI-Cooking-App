@@ -343,6 +343,52 @@
   100% { transform: rotate(360deg); }
 }
 
+/* Save Recipe Button Styles */
+.recipe-actions {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(108, 99, 255, 0.2);
+  display: flex;
+  justify-content: center;
+}
+
+.save-recipe-btn {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 140px;
+}
+
+.save-recipe-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+}
+
+.save-recipe-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.save-recipe-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.save-recipe-btn.saving {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+}
+
 @media (max-width: 600px) {
   .recipe-cards {
     grid-template-columns: 1fr;

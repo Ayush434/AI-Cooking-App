@@ -24,6 +24,9 @@ const config = {
       AUTOCOMPLETE: '/api/recipes/autocomplete',
       SEARCH_INGREDIENTS: '/api/recipes/search-ingredients',
       NUTRITION_FACTS: '/api/recipes/nutrition-facts',
+      SAVE_RECIPE: '/api/recipes/save-recipe',
+      SAVED_RECIPES: '/api/recipes/saved-recipes',
+      SAVED_RECIPE: '/api/recipes/saved-recipe',
       // Auth endpoints
       LOGIN: '/api/auth/login',
       REGISTER: '/api/auth/register',
