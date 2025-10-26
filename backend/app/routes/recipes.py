@@ -1,9 +1,14 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.utils import secure_filename
 import os
+from datetime import datetime
 from ..services.vision_service import VisionService
 from ..services.recipe_service import RecipeService
 from ..services.food_validation_service import FoodValidationService
+from ..models.recipe import Recipe
+from ..models.user import User
+from ..database import db
 
 recipes_bp = Blueprint('recipes', __name__)
 
@@ -294,3 +299,144 @@ def get_nutrition_facts():
             'error': 'Nutrition service error',
             'message': str(e)
         }), 500
+
+@recipes_bp.route('/save-recipe', methods=['POST'])
+@jwt_required()
+def save_recipe():
+    """
+    Save a recipe for the current user
+    """
+    try:
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+        
+        # Extract recipe data
+        title = data.get('title', '').strip()
+        description = data.get('description', '')
+        instructions = data.get('instructions', [])
+        ingredients = data.get('ingredients', [])
+        original_ingredients = data.get('original_ingredients', [])
+        dietary_preferences = data.get('dietary_preferences', '')
+        serving_size = data.get('serving_size', 1)
+        
+        if not title:
+            return jsonify({'error': 'Recipe title is required'}), 400
+        
+        if not instructions:
+            return jsonify({'error': 'Recipe instructions are required'}), 400
+        
+        # Create new recipe
+        recipe = Recipe(
+            title=title,
+            description=description,
+            instructions=instructions,
+            user_id=user_id,
+            is_saved=True,
+            original_ingredients=original_ingredients,
+            serving_size=serving_size,
+            dietary_tags=[dietary_preferences] if dietary_preferences else [],
+            created_at=datetime.utcnow()
+        )
+        
+        db.session.add(recipe)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Recipe saved successfully',
+            'recipe': recipe.to_dict()
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to save recipe: {str(e)}'}), 500
+
+@recipes_bp.route('/saved-recipes', methods=['GET'])
+@jwt_required()
+def get_saved_recipes():
+    """
+    Get all saved recipes for the current user
+    """
+    try:
+        user_id = get_jwt_identity()
+        
+        # Convert to int if needed
+        user_id = int(user_id) if user_id else None
+        
+        # Get saved recipes for the user
+        recipes = Recipe.query.filter_by(
+            user_id=user_id,
+            is_saved=True
+        ).order_by(Recipe.created_at.desc()).all()
+        
+        return jsonify({
+            'recipes': [recipe.to_dict() for recipe in recipes],
+            'count': len(recipes)
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to retrieve saved recipes: {str(e)}'}), 500
+
+@recipes_bp.route('/saved-recipe/<int:recipe_id>', methods=['GET'])
+@jwt_required()
+def get_saved_recipe(recipe_id):
+    """
+    Get a specific saved recipe by ID
+    """
+    try:
+        user_id = get_jwt_identity()
+        
+        # Convert to int if needed
+        user_id = int(user_id) if user_id else None
+        
+        # Get the recipe
+        recipe = Recipe.query.filter_by(
+            id=recipe_id,
+            user_id=user_id,
+            is_saved=True
+        ).first()
+        
+        if not recipe:
+            return jsonify({'error': 'Recipe not found'}), 404
+        
+        return jsonify({
+            'recipe': recipe.to_dict()
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': f'Failed to retrieve recipe: {str(e)}'}), 500
+
+@recipes_bp.route('/saved-recipe/<int:recipe_id>', methods=['DELETE'])
+@jwt_required()
+def delete_saved_recipe(recipe_id):
+    """
+    Delete a saved recipe
+    """
+    try:
+        user_id = get_jwt_identity()
+        
+        # Convert to int if needed
+        user_id = int(user_id) if user_id else None
+        
+        # Get the recipe
+        recipe = Recipe.query.filter_by(
+            id=recipe_id,
+            user_id=user_id,
+            is_saved=True
+        ).first()
+        
+        if not recipe:
+            return jsonify({'error': 'Recipe not found'}), 404
+        
+        db.session.delete(recipe)
+        db.session.commit()
+        
+        return jsonify({
+            'message': 'Recipe deleted successfully'
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to delete recipe: {str(e)}'}), 500

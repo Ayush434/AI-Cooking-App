@@ -39,6 +39,10 @@ class Recipe(db.Model):
     ai_model_used = db.Column(db.String(50))  # Which AI model generated this
     generation_prompt = db.Column(db.Text)  # Original prompt used
     
+    # Recipe source and status
+    is_saved = db.Column(db.Boolean, default=False)  # True if user saved this recipe
+    original_ingredients = db.Column(db.JSON)  # Store original ingredients used to generate recipe
+    
     # Relationships
     recipe_ingredients = db.relationship('RecipeIngredient', back_populates='recipe', cascade='all, delete-orphan')
     
@@ -67,7 +71,9 @@ class Recipe(db.Model):
             'last_made': self.last_made.isoformat() if self.last_made else None,
             'times_made': self.times_made,
             'ai_model_used': self.ai_model_used,
-            'generation_prompt': self.generation_prompt
+            'generation_prompt': self.generation_prompt,
+            'is_saved': self.is_saved,
+            'original_ingredients': self.original_ingredients or []
         }
         
         if include_ingredients:

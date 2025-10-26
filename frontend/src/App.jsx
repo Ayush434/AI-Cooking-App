@@ -5,6 +5,7 @@ import IngredientList from './components/IngredientList';
 import RecipeList from './components/RecipeList';
 import Loader from './components/Loader';
 import AuthModal from './components/AuthModal';
+import SavedRecipes from './components/SavedRecipes';
 import Navbar from './components/Navbar';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import config from './config';
@@ -41,6 +42,7 @@ function AppContent() {
   }); // State for random ingredients
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login'); // 'login', 'register', 'profile'
+  const [savedRecipesOpen, setSavedRecipesOpen] = useState(false);
   
   const { user, loading: authLoading, getAuthHeaders } = useAuth();
 
@@ -103,6 +105,14 @@ function AppContent() {
 
   const closeAuthModal = () => {
     setAuthModalOpen(false);
+  };
+
+  const openSavedRecipes = () => {
+    setSavedRecipesOpen(true);
+  };
+
+  const closeSavedRecipes = () => {
+    setSavedRecipesOpen(false);
   };
 
   // Navigation functions
@@ -310,6 +320,7 @@ function AppContent() {
         onNewRecipe={handleNewRecipe}
         onOpenAuthModal={openAuthModal}
         onGoHome={goHome}
+        onOpenSavedRecipes={openSavedRecipes}
         currentMode={mode}
       />
       
@@ -561,6 +572,12 @@ function AppContent() {
           onClose={closeAuthModal}
           authMode={authMode}
         />
+        
+        {savedRecipesOpen && (
+          <SavedRecipes
+            onClose={closeSavedRecipes}
+          />
+        )}
       </div>
       <footer className="footer">
         &copy; {currentYear} Ayush Mehta

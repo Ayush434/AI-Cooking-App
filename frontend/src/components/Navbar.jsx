@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import './Navbar.css';
 
-const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, currentMode }) => {
+const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, onOpenSavedRecipes, currentMode }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -124,6 +124,15 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, currentMode }) => {
                   ⚙️ Profile Settings
                 </button>
                 <button 
+                  className="dropdown-item"
+                  onClick={() => {
+                    onOpenSavedRecipes();
+                    setDropdownOpen(false);
+                  }}
+                >
+                  📚 Saved Recipes
+                </button>
+                <button 
                   className="dropdown-item logout-item"
                   onClick={handleLogout}
                 >
@@ -176,6 +185,15 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, currentMode }) => {
                   onClick={handleMobileAuthClick}
                 >
                   👤 {user?.username}
+                </button>
+                <button 
+                  className="mobile-nav-link"
+                  onClick={() => {
+                    onOpenSavedRecipes();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  📚 Saved Recipes
                 </button>
                 <button 
                   className="mobile-nav-link logout-link"
