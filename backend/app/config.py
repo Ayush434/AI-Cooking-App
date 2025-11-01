@@ -74,13 +74,19 @@ class Config:
     # SQLAlchemy Configuration
     SQLALCHEMY_DATABASE_URI = get_database_url()
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Reduced pool size for Supabase free tier compatibility
     SQLALCHEMY_ENGINE_OPTIONS = {
         'pool_pre_ping': True,
         'pool_recycle': 300,
-        'pool_size': 5,
-        'max_overflow': 10,
+        'pool_size': 2,  # Reduced for free tier
+        'max_overflow': 0,  # No overflow for free tier
+        'pool_timeout': 30,  # Timeout for getting connection from pool
         'connect_args': {
             'connect_timeout': 10,
+            'keepalives': 1,
+            'keepalives_idle': 30,
+            'keepalives_interval': 10,
+            'keepalives_count': 5,
         }
     }
 
