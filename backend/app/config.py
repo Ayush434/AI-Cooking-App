@@ -81,8 +81,6 @@ class Config:
         'max_overflow': 10,
         'connect_args': {
             'connect_timeout': 10,
-            # Disable prepared statements for Supabase Transaction pooler compatibility
-            'server_prepared_statements': False,
         }
     }
 
