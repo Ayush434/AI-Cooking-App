@@ -13,15 +13,16 @@
 }
 
 .saved-recipes-content {
-  background: white;
+  background: var(--bg-card);
   border-radius: 16px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 40px var(--shadow-lg);
   max-width: 1200px;
   width: 100%;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .saved-recipes-header {
@@ -73,24 +74,27 @@
   align-items: center;
   justify-content: center;
   padding: 3rem;
-  color: #666;
+  color: var(--text-tertiary);
+  transition: color 0.3s ease;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #667eea;
+  border: 4px solid var(--bg-tertiary);
+  border-top: 4px solid var(--accent-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
+  transition: border-color 0.3s ease;
 }
 
 /* Empty State */
 .empty-state {
   text-align: center;
   padding: 3rem;
-  color: #666;
+  color: var(--text-tertiary);
+  transition: color 0.3s ease;
 }
 
 .empty-icon {
@@ -100,8 +104,9 @@
 
 .empty-state h3 {
   margin: 0 0 0.5rem 0;
-  color: #333;
+  color: var(--text-primary);
   font-size: 1.3rem;
+  transition: color 0.3s ease;
 }
 
 .empty-state p {
@@ -114,7 +119,8 @@
 .auth-required {
   text-align: center;
   padding: 3rem;
-  color: #666;
+  color: var(--text-tertiary);
+  transition: color 0.3s ease;
 }
 
 .auth-required p {
@@ -131,18 +137,18 @@
 }
 
 .recipe-card {
-  background: white;
+  background: var(--bg-card);
   border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px var(--shadow-md);
   padding: 1.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-secondary);
 }
 
 .recipe-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 25px var(--shadow-lg);
 }
 
 .recipe-card-header {
@@ -156,16 +162,18 @@
   margin: 0;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   line-height: 1.3;
   flex: 1;
   margin-right: 1rem;
+  transition: color 0.3s ease;
 }
 
 .recipe-date {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-tertiary);
   white-space: nowrap;
+  transition: color 0.3s ease;
 }
 
 .recipe-card-content {
@@ -174,29 +182,33 @@
 
 .recipe-description {
   font-size: 0.9rem;
-  color: #555;
+  color: var(--text-secondary);
   line-height: 1.4;
   margin: 0 0 0.8rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  transition: color 0.3s ease;
 }
 
 .recipe-ingredients-preview {
   font-size: 0.85rem;
-  color: #666;
+  color: var(--text-tertiary);
   margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
 }
 
 .recipe-ingredients-preview strong {
-  color: #333;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
 }
 
 .recipe-serving {
   font-size: 0.8rem;
-  color: #888;
+  color: var(--text-muted);
   font-style: italic;
+  transition: color 0.3s ease;
 }
 
 .recipe-card-footer {
@@ -204,7 +216,8 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 1rem;
-  border-top: 1px solid #e9ecef;
+  border-top: 1px solid var(--border-secondary);
+  transition: border-color 0.3s ease;
 }
 
 .view-recipe-btn {
@@ -265,7 +278,8 @@
   margin: 0 0 1rem 0;
   font-size: 2rem;
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
 }
 
 .recipe-meta {
@@ -273,39 +287,45 @@
   justify-content: center;
   gap: 2rem;
   font-size: 0.9rem;
-  color: #666;
+  color: var(--text-tertiary);
+  transition: color 0.3s ease;
 }
 
 .recipe-content {
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 12px;
   padding: 2rem;
   margin-bottom: 2rem;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   line-height: 1.6;
+  transition: background-color 0.3s ease;
+  color: var(--text-primary);
 }
 
 .recipe-content h1 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary);
   margin: 0 0 1rem 0;
+  transition: color 0.3s ease;
 }
 
 .recipe-content h2 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #555;
+  color: var(--text-primary);
   margin: 1.5rem 0 0.8rem 0;
-  border-left: 3px solid #667eea;
+  border-left: 3px solid var(--accent-primary);
   padding-left: 0.8rem;
+  transition: color 0.3s ease, border-color 0.3s ease;
 }
 
 .recipe-content h3 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #666;
+  color: var(--text-secondary);
   margin: 1.2rem 0 0.6rem 0;
+  transition: color 0.3s ease;
 }
 
 .recipe-content ul, .recipe-content ol {

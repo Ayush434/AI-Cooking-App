@@ -8,6 +8,7 @@ import AuthModal from './components/AuthModal';
 import SavedRecipes from './components/SavedRecipes';
 import Navbar from './components/Navbar';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import config from './config';
 
 const currentYear = new Date().getFullYear();
@@ -472,21 +473,9 @@ function AppContent() {
               </div>
               
               {/* Dietary Preferences and Serving Size Section */}
-              <div className="recipe-preferences" style={{ 
-                marginTop: '1rem', 
-                marginBottom: '1rem',
-                padding: '1rem',
-                backgroundColor: '#f8f9fa',
-                borderRadius: '8px',
-                border: '1px solid #e9ecef'
-              }}>
+              <div className="recipe-preferences">
                 <div style={{ marginBottom: '1rem' }}>
-                  <label htmlFor="dietary-preferences" style={{ 
-                    display: 'block', 
-                    marginBottom: '0.5rem', 
-                    fontWeight: '600',
-                    color: '#495057'
-                  }}>
+                  <label htmlFor="dietary-preferences" className="recipe-preference-label">
                     Dietary Preferences (Optional):
                   </label>
                   <textarea
@@ -495,39 +484,19 @@ function AppContent() {
                     onChange={(e) => setDietaryPreferences(e.target.value)}
                     placeholder="Add specific details like 'more protein', 'less fat', 'gluten-free', 'vegetarian', 'low sodium', etc."
                     rows="3"
-                    style={{
-                      width: '100%',
-                      padding: '0.5rem',
-                      border: '1px solid #ced4da',
-                      borderRadius: '4px',
-                      fontSize: '14px',
-                      resize: 'vertical',
-                      fontFamily: 'inherit'
-                    }}
+                    className="recipe-preference-input"
                   />
                 </div>
                 
                 <div>
-                  <label htmlFor="serving-size" style={{ 
-                    display: 'block', 
-                    marginBottom: '0.5rem', 
-                    fontWeight: '600',
-                    color: '#495057'
-                  }}>
+                  <label htmlFor="serving-size" className="recipe-preference-label">
                     Number of Servings:
                   </label>
                   <select
                     id="serving-size"
                     value={servingSize}
                     onChange={(e) => setServingSize(parseInt(e.target.value))}
-                    style={{
-                      padding: '0.5rem',
-                      border: '1px solid #ced4da',
-                      borderRadius: '4px',
-                      fontSize: '14px',
-                      backgroundColor: 'white',
-                      minWidth: '100px'
-                    }}
+                    className="recipe-preference-select"
                   >
                     {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
                       <option key={num} value={num}>
@@ -588,9 +557,11 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

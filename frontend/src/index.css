@@ -8,10 +8,92 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Light theme (default) */
+:root,
+[data-theme="light"] {
+  /* Background colors */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f7ff;
+  --bg-tertiary: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --bg-hover: rgba(108, 99, 255, 0.1);
+  
+  /* Text colors */
+  --text-primary: #333333;
+  --text-secondary: #555555;
+  --text-tertiary: #666666;
+  --text-muted: #888888;
+  --text-disabled: #aaaaaa;
+  
+  /* Border colors */
+  --border-primary: #e6e0ff;
+  --border-secondary: #e9ecef;
+  --border-tertiary: #ddd;
+  
+  /* Accent colors */
+  --accent-primary: #6c63ff;
+  --accent-secondary: #48c6ef;
+  --accent-hover: #4c46d4;
+  
+  /* Shadow colors */
+  --shadow-sm: rgba(108, 99, 255, 0.13);
+  --shadow-md: rgba(0, 0, 0, 0.08);
+  --shadow-lg: rgba(0, 0, 0, 0.15);
+  
+  /* Status colors */
+  --success: #28a745;
+  --error: #dc3545;
+  --warning: #ff9800;
+  --info: #2196f3;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  /* Background colors */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2d2d2d;
+  --bg-tertiary: #3a3a3a;
+  --bg-card: #252525;
+  --bg-input: #2d2d2d;
+  --bg-hover: rgba(108, 99, 255, 0.2);
+  
+  /* Text colors */
+  --text-primary: #e0e0e0;
+  --text-secondary: #c0c0c0;
+  --text-tertiary: #a0a0a0;
+  --text-muted: #888888;
+  --text-disabled: #666666;
+  
+  /* Border colors */
+  --border-primary: #404040;
+  --border-secondary: #3a3a3a;
+  --border-tertiary: #4a4a4a;
+  
+  /* Accent colors */
+  --accent-primary: #7c73ff;
+  --accent-secondary: #58d6ff;
+  --accent-hover: #6c63ff;
+  
+  /* Shadow colors */
+  --shadow-sm: rgba(0, 0, 0, 0.3);
+  --shadow-md: rgba(0, 0, 0, 0.4);
+  --shadow-lg: rgba(0, 0, 0, 0.5);
+  
+  /* Status colors */
+  --success: #4caf50;
+  --error: #f44336;
+  --warning: #ff9800;
+  --info: #2196f3;
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1 {

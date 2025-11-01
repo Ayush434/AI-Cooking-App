@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 import './Navbar.css';
 
 const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, onOpenSavedRecipes, currentMode }) => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -99,6 +101,15 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, onOpenSavedRecipes, cu
             ➕ New Recipe
           </button>
           
+          <button 
+            className="theme-toggle-btn"
+            onClick={toggleTheme}
+            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
+          
           <div className="dropdown-container" ref={dropdownRef}>
             <button 
               className="nav-link auth-link"
@@ -176,6 +187,16 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, onOpenSavedRecipes, cu
               }}
             >
               ➕ New Recipe
+            </button>
+            
+            <button 
+              className="mobile-nav-link"
+              onClick={() => {
+                toggleTheme();
+                setMobileMenuOpen(false);
+              }}
+            >
+              {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
             </button>
             
             {isAuthenticated ? (

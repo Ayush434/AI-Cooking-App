@@ -1,13 +1,13 @@
 .ingredient-input-card {
-  background: #fff;
+  background: var(--bg-card);
   border-radius: 16px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 16px var(--shadow-md);
   padding: 2rem 1.5rem;
   margin-bottom: 2rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  transition: box-shadow 0.2s, transform 0.15s;
+  transition: box-shadow 0.2s, transform 0.15s, background-color 0.3s ease;
   position: relative;
   z-index: 2;
 }
@@ -36,17 +36,18 @@
 .text-input, .file-input {
   padding: 0.5rem 1rem;
   border-radius: 8px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-tertiary);
   font-size: 1rem;
   outline: none;
-  transition: border 0.2s;
-  background: #fff;
+  transition: border 0.2s, background-color 0.3s ease, color 0.3s ease;
+  background: var(--bg-input);
+  color: var(--text-primary);
 }
 .text-input:focus, .file-input:focus {
-  border: 1.5px solid #6c63ff;
+  border: 1.5px solid var(--accent-primary);
 }
 .add-btn, .detect-btn {
-  background: linear-gradient(90deg, #6c63ff 60%, #48c6ef 100%);
+  background: linear-gradient(90deg, var(--accent-primary) 60%, var(--accent-secondary) 100%);
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -61,17 +62,18 @@
   transform: scale(0.97);
 }
 .add-btn:disabled, .detect-btn:disabled {
-  background: #ccc;
+  background: var(--text-disabled);
   cursor: not-allowed;
 }
 .image-label, .text-label {
   font-weight: 600;
   font-size: 1.08rem;
-  color: #6c63ff;
+  color: var(--accent-primary);
   display: flex;
   align-items: center;
   gap: 0.4rem;
   margin-bottom: 0.2rem;
+  transition: color 0.3s ease;
 }
 .label-icon {
   font-size: 1.25rem;
@@ -89,12 +91,12 @@
 
 /* Validation styles */
 .text-input.valid {
-  border-color: #28a745;
+  border-color: var(--success);
   box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
 }
 
 .text-input.invalid {
-  border-color: #dc3545;
+  border-color: var(--error);
   box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
 }
 
@@ -103,9 +105,10 @@
   top: 100%;
   left: 0;
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--text-tertiary);
   margin-top: 0.2rem;
   font-style: italic;
+  transition: color 0.3s ease;
 }
 
 .validation-feedback {
@@ -120,10 +123,11 @@
   gap: 0.3rem;
   padding: 0.3rem 0.5rem;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-card);
   backdrop-filter: blur(4px);
   z-index: 20; /* Higher than autocomplete */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--shadow-md);
+  transition: background-color 0.3s ease;
 }
 
 .validation-above {
@@ -165,12 +169,12 @@
 }
 
 .validation-feedback.valid {
-  color: #28a745;
+  color: var(--success);
   background: rgba(40, 167, 69, 0.1);
 }
 
 .validation-feedback.invalid {
-  color: #dc3545;
+  color: var(--error);
   background: rgba(220, 53, 69, 0.1);
 }
 
@@ -234,19 +238,21 @@
 /* Suggestions */
 .suggestions-container {
   padding: 0.8rem 1rem;
-  background: #f8f9fa;
+  background: var(--bg-tertiary);
   border-radius: 12px;
-  border: 2px solid #e9ecef;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 2px solid var(--border-secondary);
+  box-shadow: 0 2px 8px var(--shadow-md);
   position: relative;
   z-index: 25; /* Higher than both validation and autocomplete */
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .suggestions-label {
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--text-tertiary);
   margin-bottom: 0.3rem;
   font-weight: 500;
+  transition: color 0.3s ease;
 }
 
 .suggestions-list {
@@ -256,9 +262,9 @@
 }
 
 .suggestion-btn {
-  background: #e3f2fd;
-  color: #1976d2;
-  border: 1px solid #bbdefb;
+  background: var(--bg-card);
+  color: var(--info);
+  border: 1px solid var(--border-secondary);
   padding: 0.2rem 0.6rem;
   border-radius: 12px;
   font-size: 0.75rem;
@@ -267,8 +273,8 @@
 }
 
 .suggestion-btn:hover {
-  background: #bbdefb;
-  border-color: #90caf9;
+  background: var(--bg-hover);
+  border-color: var(--info);
   transform: translateY(-1px);
 }
 
@@ -535,15 +541,16 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: white;
-  border: 1px solid #e1e5e9;
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px var(--shadow-lg);
   max-height: 200px;
   overflow-y: auto;
   z-index: 15; /* Reduced z-index to prevent overlap issues */
   margin-top: 2px;
   animation: slideUp 0.2s ease-out;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 /* Mobile autocomplete positioning - override desktop styles */
@@ -656,7 +663,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--border-secondary);
   transition: background-color 0.2s ease;
 }
 
@@ -665,40 +672,23 @@
 }
 
 .autocomplete-item:hover {
-  background-color: #f8f9fa;
-}
-
-/* Simple autocomplete items */
-.autocomplete-item {
-  padding: 10px 12px;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background-color 0.2s ease;
-}
-
-.autocomplete-item:last-child {
-  border-bottom: none;
-}
-
-.autocomplete-item:hover {
-  background-color: #f8f9fa;
+  background-color: var(--bg-hover);
 }
 
 .suggestion-name {
   font-weight: 500;
-  color: #333;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
 }
 
 .suggestion-category {
   font-size: 0.75rem;
-  color: #6c757d;
-  background: #e9ecef;
+  color: var(--text-tertiary);
+  background: var(--bg-tertiary);
   padding: 2px 6px;
   border-radius: 4px;
   text-transform: capitalize;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Scrollbar for autocomplete dropdown */
@@ -707,15 +697,15 @@
 }
 
 .autocomplete-dropdown::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--bg-tertiary);
   border-radius: 3px;
 }
 
 .autocomplete-dropdown::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: var(--text-muted);
   border-radius: 3px;
 }
 
 .autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: var(--text-tertiary);
 } 

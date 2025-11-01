@@ -4,49 +4,54 @@ body, html, #root {
   margin: 0;
   padding: 0;
   font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  background: #fff;
+  background: var(--bg-primary);
+  transition: background-color 0.3s ease;
 }
 .main-bg {
   min-height: 100vh;
   min-width: 100vw;
-  background: #fff;
+  background: var(--bg-primary);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   padding: 0;
+  transition: background-color 0.3s ease;
 }
 .app-container {
   width: 100%;
   max-width: 540px;
   margin: 1rem auto;
-  background: #f8f7ff;
+  background: var(--bg-secondary);
   border-radius: 28px;
-  box-shadow: 0 6px 36px rgba(108,99,255,0.13);
+  box-shadow: 0 6px 36px var(--shadow-sm);
   padding: 2.5rem 2rem 2rem 2rem;
   display: flex;
   flex-direction: column;
   gap: 2.2rem;
   align-items: center;
-  border: 2.5px solid #e6e0ff;
+  border: 2.5px solid var(--border-primary);
   /* Center horizontally */
   margin-left: auto;
   margin-right: auto;
   margin-top: 2rem;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .app-title {
   font-size: 2.2rem;
   font-weight: 800;
-  color: #6c63ff;
+  color: var(--accent-primary);
   margin-bottom: 0.2rem;
   text-align: center;
   letter-spacing: -1px;
+  transition: color 0.3s ease;
 }
 .subtitle {
-  color: #555;
+  color: var(--text-secondary);
   font-size: 1.1rem;
   text-align: center;
   margin-bottom: 1.5rem;
+  transition: color 0.3s ease;
 }
 
 /* App Header Styles */
@@ -79,11 +84,11 @@ body, html, #root {
   transform: scale(0.97);
 }
 .get-recipes-btn:disabled {
-  background: #ccc;
+  background: var(--text-disabled);
   cursor: not-allowed;
 }
 .main-new-recipe {
-  background: linear-gradient(90deg, #48c6ef 0%, #6c63ff 100%);
+  background: linear-gradient(90deg, var(--accent-secondary) 0%, var(--accent-primary) 100%);
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -102,7 +107,7 @@ body, html, #root {
   transform: scale(0.97);
 }
 .add-ingredient-btn {
-  background: linear-gradient(90deg, #6c63ff 60%, #48c6ef 100%);
+  background: linear-gradient(90deg, var(--accent-primary) 60%, var(--accent-secondary) 100%);
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -122,12 +127,13 @@ body, html, #root {
   /* Remove width: 100vw; */
   text-align: center;
   padding: 1.2rem 0 0.5rem 0;
-  color: #888;
+  color: var(--text-muted);
   font-size: 1rem;
   letter-spacing: 0.5px;
   background: none;
   width: 100%;
   margin-top: auto;
+  transition: color 0.3s ease;
 }
 
 /* Home page New Recipe button styling */
@@ -154,11 +160,67 @@ body, html, #root {
   box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
 }
 .ingredient-note {
-  color: #6c63ff;
+  color: var(--accent-primary);
   font-size: 1rem;
   margin: 0.5rem 0 0.2rem 0.2rem;
   font-weight: 500;
   letter-spacing: 0.1px;
+  transition: color 0.3s ease;
+}
+
+/* Recipe Preferences Section */
+.recipe-preferences {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: var(--bg-tertiary);
+  border-radius: 8px;
+  border: 1px solid var(--border-secondary);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.recipe-preference-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  transition: color 0.3s ease;
+}
+
+.recipe-preference-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-tertiary);
+  border-radius: 4px;
+  fontSize: 14px;
+  resize: vertical;
+  font-family: inherit;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.recipe-preference-input:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
+}
+
+.recipe-preference-select {
+  padding: 0.5rem;
+  border: 1px solid var(--border-tertiary);
+  border-radius: 4px;
+  fontSize: 14px;
+  backgroundColor: var(--bg-input);
+  color: var(--text-primary);
+  minWidth: 100px;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.recipe-preference-select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
 }
 
 /* Home Page Content Styling */
@@ -176,9 +238,10 @@ body, html, #root {
 .info-section h2 {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #6c63ff;
+  color: var(--accent-primary);
   margin-bottom: 2rem;
   text-align: center;
+  transition: color 0.3s ease;
 }
 
 /* Benefits Grid */
@@ -190,12 +253,12 @@ body, html, #root {
 }
 
 .benefit-card {
-  background: linear-gradient(120deg, #ffffff 60%, #f8f7ff 100%);
+  background: linear-gradient(120deg, var(--bg-card) 60%, var(--bg-secondary) 100%);
   border-radius: 16px;
   padding: 1.8rem 1.2rem;
-  box-shadow: 0 4px 16px rgba(108, 99, 255, 0.08);
-  border: 1px solid #e6e0ff;
-  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 16px var(--shadow-md);
+  border: 1px solid var(--border-primary);
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s ease, border-color 0.3s ease;
   text-align: center;
 }
 
@@ -212,15 +275,17 @@ body, html, #root {
 .benefit-card h3 {
   font-size: 1.2rem;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 0.8rem;
+  transition: color 0.3s ease;
 }
 
 .benefit-card p {
-  color: #666;
+  color: var(--text-tertiary);
   line-height: 1.5;
   margin: 0;
   font-size: 0.95rem;
+  transition: color 0.3s ease;
 }
 
 /* Steps Container */
@@ -232,12 +297,12 @@ body, html, #root {
 }
 
 .step-card {
-  background: linear-gradient(120deg, #f0f8ff 60%, #e3f2fd 100%);
+  background: linear-gradient(120deg, var(--bg-tertiary) 60%, var(--bg-card) 100%);
   border-radius: 16px;
   padding: 2rem 1.5rem;
-  border-left: 4px solid #2196f3;
-  box-shadow: 0 4px 16px rgba(33, 150, 243, 0.08);
-  transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 4px solid var(--info);
+  box-shadow: 0 4px 16px var(--shadow-md);
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s ease;
   text-align: center;
   position: relative;
 }
@@ -265,15 +330,17 @@ body, html, #root {
 .step-card h3 {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #1976d2;
+  color: var(--info);
   margin-bottom: 0.8rem;
+  transition: color 0.3s ease;
 }
 
 .step-card p {
-  color: #424242;
+  color: var(--text-primary);
   line-height: 1.5;
   margin: 0;
   font-size: 0.95rem;
+  transition: color 0.3s ease;
 }
 
 /* Features List */
@@ -288,15 +355,15 @@ body, html, #root {
 }
 
 .feature-item {
-  background: linear-gradient(120deg, #f8f9fa 60%, #e8f5e8 100%);
+  background: linear-gradient(120deg, var(--bg-tertiary) 60%, var(--bg-card) 100%);
   border-radius: 12px;
   padding: 1.2rem 1.5rem;
-  border-left: 4px solid #4caf50;
-  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.08);
+  border-left: 4px solid var(--success);
+  box-shadow: 0 2px 8px var(--shadow-md);
   display: flex;
   align-items: center;
   gap: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s ease;
 }
 
 .feature-item:hover {
@@ -310,14 +377,16 @@ body, html, #root {
 }
 
 .feature-item strong {
-  color: #2e7d32;
+  color: var(--success);
   margin-right: 0.5rem;
+  transition: color 0.3s ease;
 }
 
 .feature-item span:not(.feature-icon) {
-  color: #424242;
+  color: var(--text-primary);
   line-height: 1.4;
   font-size: 0.95rem;
+  transition: color 0.3s ease;
 }
 
 /* Random Ingredients Section */
@@ -326,12 +395,13 @@ body, html, #root {
   max-width: 100%;
   margin: 1.5rem 0;
   padding: 1.2rem;
-  background: linear-gradient(120deg, #fff8e1 60%, #ffecb3 100%);
+  background: linear-gradient(120deg, var(--bg-tertiary) 60%, var(--bg-card) 100%);
   border-radius: 12px;
-  border: 1px solid #ffc107;
-  box-shadow: 0 2px 8px rgba(255, 193, 7, 0.1);
+  border: 1px solid var(--warning);
+  box-shadow: 0 2px 8px var(--shadow-md);
   box-sizing: border-box;
   overflow: hidden;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .random-header {
@@ -348,9 +418,10 @@ body, html, #root {
 
 .random-header h3 {
   margin: 0;
-  color: #f57c00;
+  color: var(--warning);
   font-size: 1.1rem;
   font-weight: 600;
+  transition: color 0.3s ease;
 }
 
 .generate-random-btn {
@@ -384,10 +455,11 @@ body, html, #root {
 
 .random-subtitle {
   margin: 0 0 0.8rem 0;
-  color: #e65100;
+  color: var(--warning);
   font-size: 0.9rem;
   font-weight: 500;
   text-align: center;
+  transition: color 0.3s ease;
 }
 
 .random-ingredients-list {
@@ -400,11 +472,11 @@ body, html, #root {
 }
 
 .random-ingredient-btn {
-  background: linear-gradient(120deg, #ffffff 60%, #fff3e0 100%);
-  border: 2px solid #ff9800;
+  background: linear-gradient(120deg, var(--bg-card) 60%, var(--bg-tertiary) 100%);
+  border: 2px solid var(--warning);
   border-radius: 8px;
   padding: 0.8rem 0.6rem;
-  color: #e65100;
+  color: var(--warning);
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
