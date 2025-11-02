@@ -138,7 +138,16 @@ Make sure the recipe is:
                 if not line:
                     continue
                 
-                # Check for title
+                # Check for title in markdown format (# Title)
+                if line.startswith('# ') and title == "Generated Recipe":
+                    title_part = line[2:].strip()  # Remove '# ' prefix
+                    # Make sure it's not a section header
+                    if (title_part.lower() not in ['ingredients', 'instructions', 'tips', 'directions', 'steps'] and
+                        len(title_part) > 5 and ' ' in title_part):
+                        title = title_part.replace('*', '').replace('#', '').strip()
+                        continue
+                
+                # Check for title in old format (title: ...)
                 if line.lower().startswith('title:'):
                     title = line.split(':', 1)[1].strip()
                     if title.startswith('[') and title.endswith(']'):

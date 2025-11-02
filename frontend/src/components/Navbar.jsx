@@ -80,25 +80,26 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, onOpenSavedRecipes, cu
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        {/* Logo/Brand */}
+        {/* Logo/Brand - Clickable to go home */}
         <div className="navbar-brand">
-          <h2>🍳 SnackHack</h2>
+          <h2 
+            onClick={handleHomeClick}
+            className="navbar-brand-title"
+            style={{ cursor: 'pointer' }}
+          >
+            🍳 SnackHack
+          </h2>
         </div>
 
         {/* Navigation Links */}
         <div className="navbar-links">
           <button 
-            className={`nav-link ${currentMode === 'initial' ? 'active' : ''}`}
-            onClick={handleHomeClick}
-          >
-            🏠 Home
-          </button>
-          
-          <button 
             className={`nav-link ${currentMode === 'adding' ? 'active' : ''}`}
             onClick={handleNewRecipeClick}
+            title="New Recipe"
+            aria-label="New Recipe"
           >
-            ➕ New Recipe
+            ➕
           </button>
           
           <button 
@@ -141,7 +142,7 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, onOpenSavedRecipes, cu
                     setDropdownOpen(false);
                   }}
                 >
-                  📚 Saved Recipes
+                  📚 Recipes
                 </button>
                 <button 
                   className="dropdown-item logout-item"
@@ -169,16 +170,6 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, onOpenSavedRecipes, cu
       {mobileMenuOpen && (
         <div className="mobile-menu">
           <div className="mobile-menu-content">
-            <button 
-              className={`mobile-nav-link ${currentMode === 'initial' ? 'active' : ''}`}
-              onClick={() => {
-                handleHomeClick();
-                setMobileMenuOpen(false);
-              }}
-            >
-              🏠 Home
-            </button>
-            
             <button 
               className={`mobile-nav-link ${currentMode === 'adding' ? 'active' : ''}`}
               onClick={() => {
@@ -214,7 +205,7 @@ const Navbar = ({ onNewRecipe, onOpenAuthModal, onGoHome, onOpenSavedRecipes, cu
                     setMobileMenuOpen(false);
                   }}
                 >
-                  📚 Saved Recipes
+                  📚 Recipes
                 </button>
                 <button 
                   className="mobile-nav-link logout-link"

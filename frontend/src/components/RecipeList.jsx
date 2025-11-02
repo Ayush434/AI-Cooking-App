@@ -8,10 +8,23 @@ import './RecipeList.css';
 function RecipeList({ recipes, originalIngredients, dietaryPreferences, servingSize }) {
   const [showNutrition, setShowNutrition] = useState(false);
   const [nutritionLoading, setNutritionLoading] = useState(false);
-  const [savingRecipe, setSavingRecipe] = useState(false);
-  const [savedRecipes, setSavedRecipes] = useState(new Set());
+  const [favouritingRecipe, setFavouritingRecipe] = useState(null);
+  const [favouriteRecipes, setFavouriteRecipes] = useState(new Set());
   
   const { isAuthenticated, getAuthHeaders } = useAuth();
+  
+  // Check if a recipe is favourited (by ID if available, or by title)
+  const isFavourite = (recipe) => {
+    // First check if recipe has is_saved flag (from database)
+    if (recipe.is_saved !== undefined) {
+      return recipe.is_saved;
+    }
+    // Fallback to local state
+    if (recipe.id) {
+      return favouriteRecipes.has(recipe.id);
+    }
+    return favouriteRecipes.has(recipe.title);
+  };
   
   if (!recipes.length) return null;
   
@@ -78,116 +91,62 @@ function RecipeList({ recipes, originalIngredients, dietaryPreferences, servingS
   console.log('Original user ingredients:', originalIngredients);
   console.log('AI-generated recipe ingredients:', recipeIngredients);
   
-  // Save recipe function
-  const saveRecipe = async (recipe) => {
+  // Toggle favourite function
+  const toggleFavourite = async (recipe) => {
     if (!isAuthenticated) {
-      alert('Please log in to save recipes');
+      alert('Please log in to favourite recipes');
       return;
     }
     
-    setSavingRecipe(true);
+    if (!recipe.id) {
+      alert('Recipe ID not found. Please wait for the recipe to be saved.');
+      return;
+    }
+    
+    setFavouritingRecipe(recipe.id);
     try {
       const headers = {
         'Content-Type': 'application/json',
         ...getAuthHeaders()
       };
       
-      // Extract title from markdown content
-      let title = recipe.title || 'Untitled Recipe';
-      if (recipe.markdown_content) {
-        // Try multiple patterns to extract the title
-        const content = recipe.markdown_content;
-        
-        // Pattern 1: Look for the first line that starts with # and contains a proper recipe title
-        const lines = content.split('\n');
-        for (const line of lines) {
-          const trimmed = line.trim();
-          
-          // Look for lines starting with # that contain recipe titles
-          if (trimmed.startsWith('#') && trimmed.length > 2) {
-            // Extract the title part (after #)
-            const titlePart = trimmed.substring(1).trim();
-            
-            // Skip if it's just "Ingredients" or similar
-            if (titlePart.toLowerCase() !== 'ingredients' && 
-                titlePart.toLowerCase() !== 'instructions' &&
-                titlePart.toLowerCase() !== 'tips' &&
-                titlePart.toLowerCase() !== 'directions' &&
-                titlePart.length > 5 &&
-                titlePart.includes(' ')) { // Contains spaces (likely a proper title)
-              
-              // Clean up the title
-              title = titlePart.replace(/\*/g, '').trim();
-              break;
-            }
-          }
-        }
-        
-        // Pattern 2: Look for the first meaningful line that's not a section header
-        if (title === 'Untitled Recipe' || title.toLowerCase().includes('ingredients')) {
-          for (const line of lines) {
-            const trimmed = line.trim();
-            // Look for lines that look like recipe titles
-            if (trimmed && 
-                !trimmed.startsWith('#') && // Not a markdown header
-                !trimmed.toLowerCase().includes('ingredients') && 
-                !trimmed.toLowerCase().includes('instructions') &&
-                !trimmed.toLowerCase().includes('tips') &&
-                !trimmed.toLowerCase().includes('directions') &&
-                !trimmed.toLowerCase().includes('steps') &&
-                !trimmed.match(/^\d+\./) && // Not a numbered step
-                !trimmed.match(/^[-*•]/) && // Not a bullet point
-                trimmed.length > 5 && 
-                trimmed.length < 80 &&
-                !trimmed.match(/^\s*$/) && // Not empty
-                trimmed.includes(' ')) { // Contains spaces (likely a title)
-              title = trimmed;
-              break;
-            }
-          }
-        }
-        
-        // Clean up the title
-        title = title.replace(/^#+\s*/, '').replace(/\*+/g, '').trim();
-        
-        // Final fallback: Generate a title based on ingredients if we still don't have a good title
-        if (title === 'Untitled Recipe' || title.toLowerCase().includes('ingredients') || title.length < 3) {
-          if (originalIngredients && originalIngredients.length > 0) {
-            const mainIngredients = originalIngredients.slice(0, 2);
-            title = `${mainIngredients.join(' and ')} Recipe`;
-          }
-        }
-      }
-      
-      const recipeData = {
-        title: title,
-        description: recipe.description || '',
-        instructions: recipe.markdown_content || recipe.instructions || '',
-        ingredients: recipeIngredients,
-        original_ingredients: originalIngredients,
-        dietary_preferences: dietaryPreferences,
-        serving_size: servingSize
-      };
-      
-      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.SAVE_RECIPE}`, {
+      const response = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.TOGGLE_FAVOURITE}`, {
         method: 'POST',
         headers,
-        body: JSON.stringify(recipeData)
+        body: JSON.stringify({ recipe_id: recipe.id })
       });
       
       if (response.ok) {
         const data = await response.json();
-        setSavedRecipes(prev => new Set([...prev, recipe.title || title]));
-        alert('Recipe saved successfully!');
+        const isNowFavourite = data.is_favourite;
+        
+        // Update local state
+        if (isNowFavourite) {
+          setFavouriteRecipes(prev => new Set([...prev, recipe.id]));
+        } else {
+          setFavouriteRecipes(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(recipe.id);
+            return newSet;
+          });
+        }
       } else {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to save recipe');
+        // Show user-friendly error message for max favourites limit
+        if (errorData.max_favourites) {
+          alert(`You can only have ${errorData.max_favourites} favourite recipes. Please unfavourite one first.`);
+          return; // Exit early since we've shown the alert
+        }
+        throw new Error(errorData.error || 'Failed to toggle favourite');
       }
     } catch (error) {
-      console.error('Error saving recipe:', error);
-      alert(`Failed to save recipe: ${error.message}`);
+      console.error('Error toggling favourite:', error);
+      // Only show alert if we haven't already shown one for max favourites
+      if (!error.message.includes('max_favourites')) {
+        alert(`Failed to toggle favourite: ${error.message}`);
+      }
     } finally {
-      setSavingRecipe(false);
+      setFavouritingRecipe(null);
     }
   };
   
@@ -259,22 +218,23 @@ function RecipeList({ recipes, originalIngredients, dietaryPreferences, servingS
                   </>
                 )}
                 
-                {/* Save Recipe Button */}
-                {isAuthenticated && (
+                {/* Favourite Toggle Button */}
+                {isAuthenticated && rec.id && (
                   <div className="recipe-actions">
                     <button
-                      className={`save-recipe-btn ${savingRecipe ? 'saving' : ''}`}
-                      onClick={() => saveRecipe(rec)}
-                      disabled={savingRecipe}
+                      className={`favourite-btn ${isFavourite(rec) ? 'favourited' : ''} ${favouritingRecipe === rec.id ? 'loading' : ''}`}
+                      onClick={() => toggleFavourite(rec)}
+                      disabled={favouritingRecipe === rec.id}
+                      title={isFavourite(rec) ? 'Unfavourite recipe' : 'Favourite recipe'}
                     >
-                      {savingRecipe ? (
+                      {favouritingRecipe === rec.id ? (
                         <>
                           <div className="btn-spinner"></div>
-                          Saving...
+                          ...
                         </>
                       ) : (
                         <>
-                          💾 Save Recipe
+                          {isFavourite(rec) ? '⭐ Favourited' : '☆ Favourite'}
                         </>
                       )}
                     </button>

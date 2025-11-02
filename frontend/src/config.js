@@ -24,9 +24,10 @@ const config = {
       AUTOCOMPLETE: '/api/recipes/autocomplete',
       SEARCH_INGREDIENTS: '/api/recipes/search-ingredients',
       NUTRITION_FACTS: '/api/recipes/nutrition-facts',
-      SAVE_RECIPE: '/api/recipes/save-recipe',
-      SAVED_RECIPES: '/api/recipes/saved-recipes',
+      TOGGLE_FAVOURITE: '/api/recipes/toggle-favourite',
+      FAVOURITE_RECIPES: '/api/recipes/favourite-recipes',
       SAVED_RECIPE: '/api/recipes/saved-recipe',
+      MY_RECIPES: '/api/recipes/my-recipes',
       // Auth endpoints
       LOGIN: '/api/auth/login',
       REGISTER: '/api/auth/register',

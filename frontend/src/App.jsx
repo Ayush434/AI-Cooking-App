@@ -335,13 +335,31 @@ function AppContent() {
         </div>
         {(mode === 'initial' || mode === 'afterRecipe') && (
           <>
-            <button
-              className="main-new-recipe new-recipe-btn home-new-recipe"
-              onClick={handleNewRecipe}
-              style={{ marginBottom: '2rem' }}
-            >
-              New Recipe
-            </button>
+            <div className="home-buttons-wrapper">
+              <button
+                className="home-action-btn home-new-recipe-btn"
+                onClick={handleNewRecipe}
+              >
+                ➕ New Recipe
+              </button>
+              
+              {user && (
+                <>
+                  <button
+                    className="home-action-btn home-recipes-btn"
+                    onClick={openSavedRecipes}
+                  >
+                    📚 Recipes
+                  </button>
+                  <button
+                    className="home-action-btn home-profile-btn"
+                    onClick={() => openAuthModal('profile')}
+                  >
+                    ⚙️ Profile Settings
+                  </button>
+                </>
+              )}
+            </div>
             
             {/* Show informational content only on initial load */}
             {mode === 'initial' && (
