@@ -196,7 +196,7 @@ function SavedRecipes({ onClose }) {
   const currentRecipes = activeTab === 'all' ? allRecipes : savedRecipes;
   
   // Pagination logic
-  const totalPages = Math.ceil(currentRecipes.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(currentRecipes.length / itemsPerPage));
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedRecipes = currentRecipes.slice(startIndex, endIndex);
@@ -207,11 +207,15 @@ function SavedRecipes({ onClose }) {
   }, [activeTab]);
   
   const handlePageChange = (page) => {
-    setCurrentPage(page);
-    // Scroll to top of recipes section
-    const recipesBody = document.querySelector('.saved-recipes-body');
-    if (recipesBody) {
-      recipesBody.scrollTop = 0;
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+      // Scroll to top of recipes section
+      setTimeout(() => {
+        const recipesBody = document.querySelector('.saved-recipes-body');
+        if (recipesBody) {
+          recipesBody.scrollTop = 0;
+        }
+      }, 50);
     }
   };
 
