@@ -37,6 +37,7 @@ function AppContent() {
     const saved = localStorage.getItem('app_serving_size');
     return saved ? parseInt(saved) : 1;
   }); // New state for serving size
+  const [useGemini, setUseGemini] = useState(false); // Opt-in for Gemini AI (logged-in users only)
   const [randomIngredients, setRandomIngredients] = useState(() => {
     const saved = localStorage.getItem('app_random_ingredients');
     return saved ? JSON.parse(saved) : [];
@@ -45,7 +46,29 @@ function AppContent() {
   const [authMode, setAuthMode] = useState('login'); // 'login', 'register', 'profile'
   const [savedRecipesOpen, setSavedRecipesOpen] = useState(false);
   
-  const { user, loading: authLoading, getAuthHeaders } = useAuth();
+  const { user, loading: authLoading, getAuthHeaders, isAuthenticated } = useAuth();
+  
+  // Reset Gemini preference when user logs out
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setUseGemini(false);
+    }
+  }, [isAuthenticated]);
+  
+  // Auto-populate dietary preferences from user profile when logged in and in recipe creation mode
+  useEffect(() => {
+    if (isAuthenticated && user && user.dietary_preferences && user.dietary_preferences.length > 0) {
+      // Only populate when in adding mode or initial mode (recipe creation)
+      if ((mode === 'adding' || mode === 'initial')) {
+        const currentPrefs = dietaryPreferences || '';
+        // Only auto-populate if the field is empty (user hasn't manually entered anything)
+        if (currentPrefs.trim() === '') {
+          const prefsString = user.dietary_preferences.join(', ');
+          setDietaryPreferences(prefsString);
+        }
+      }
+    }
+  }, [mode, isAuthenticated, user]); // Re-run when mode changes, user logs in, or profile updates
 
   // Keep-alive ping to prevent server spin-down
   useEffect(() => {
@@ -266,14 +289,24 @@ function AppContent() {
         ...getAuthHeaders()
       };
       
+      const requestBody = { 
+        ingredients,
+        dietary_preferences: dietaryPreferences.trim(),
+        serving_size: servingSize,
+        use_gemini: useGemini && isAuthenticated // Only send if user is logged in and opted in
+      };
+      
+      console.log('🍳 Recipe request:', {
+        useGemini: useGemini,
+        isAuthenticated: isAuthenticated,
+        use_gemini_sent: requestBody.use_gemini,
+        ingredients_count: ingredients.length
+      });
+      
       const res = await fetch(`${config.API_BASE_URL}${config.ENDPOINTS.GET_RECIPES}`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ 
-          ingredients,
-          dietary_preferences: dietaryPreferences.trim(),
-          serving_size: servingSize
-        }),
+        body: JSON.stringify(requestBody),
       });
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
@@ -303,8 +336,15 @@ function AppContent() {
   const handleNewRecipe = () => {
     setIngredients([]);
     setRecipes([]);
-    setDietaryPreferences('');
+    // Auto-populate dietary preferences from user profile if available
+    if (isAuthenticated && user && user.dietary_preferences && user.dietary_preferences.length > 0) {
+      const prefsString = user.dietary_preferences.join(', ');
+      setDietaryPreferences(prefsString);
+    } else {
+      setDietaryPreferences(''); // Clear if no saved preferences
+    }
     setServingSize(1);
+    setUseGemini(false); // Reset Gemini opt-in
     setRandomIngredients([]);
     setMode('adding');
   };
@@ -495,6 +535,12 @@ function AppContent() {
                 <div style={{ marginBottom: '1rem' }}>
                   <label htmlFor="dietary-preferences" className="recipe-preference-label">
                     Dietary Preferences (Optional):
+                    {isAuthenticated && user && user.dietary_preferences && user.dietary_preferences.length > 0 && 
+                     dietaryPreferences && dietaryPreferences.trim() === user.dietary_preferences.join(', ') && (
+                      <span style={{ fontSize: '0.85rem', color: 'var(--text-tertiary)', fontStyle: 'italic', marginLeft: '0.5rem' }}>
+                        (from profile)
+                      </span>
+                    )}
                   </label>
                   <textarea
                     id="dietary-preferences"
@@ -523,6 +569,28 @@ function AppContent() {
                     ))}
                   </select>
                 </div>
+                
+                {/* Gemini AI Opt-in (only for logged-in users) */}
+                {isAuthenticated && (
+                  <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: 'var(--bg-tertiary)', borderRadius: '8px', border: '1px solid var(--border-secondary)' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '0.5rem' }}>
+                      <input
+                        type="checkbox"
+                        checked={useGemini}
+                        onChange={(e) => setUseGemini(e.target.checked)}
+                        style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                      />
+                      <div>
+                        <span style={{ fontWeight: 600, color: 'var(--accent-primary)' }}>
+                          🚀 Use Gemini AI (Premium)
+                        </span>
+                        <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
+                          Faster and more reliable recipe generation. Default uses Mistral AI.
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                )}
               </div>
             </div>
             <button

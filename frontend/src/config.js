@@ -2,8 +2,8 @@
 const config = {
     // API Base URL - change this for production
     // Change this line:
-    API_BASE_URL: 'https://ai-cooking-app.onrender.com/',
-    // API_BASE_URL: 'http://127.0.0.1:5000',
+    // API_BASE_URL: 'https://ai-cooking-app.onrender.com/',
+    API_BASE_URL: 'http://127.0.0.1:5000',
     
     // App settings
     APP_NAME: 'SnackHack',
