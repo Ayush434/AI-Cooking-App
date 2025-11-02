@@ -285,6 +285,29 @@
   color: #bf360c;
 }
 
+/* AI Model Acknowledgment Styling */
+.ai-model-acknowledgment {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(108, 99, 255, 0.15);
+  text-align: center;
+}
+
+.ai-model-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+  transition: color 0.3s ease;
+}
+
+.ai-model-text strong {
+  color: var(--accent-primary);
+  font-weight: 600;
+  font-style: normal;
+  transition: color 0.3s ease;
+}
+
 /* Nutrition Facts Section */
 .nutrition-section {
   text-align: center;

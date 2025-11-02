@@ -181,7 +181,7 @@ def _save_recipe_to_db(recipe_data, user_id, original_ingredients, dietary_prefe
             original_ingredients=original_ingredients,
             serving_size=serving_size,
             dietary_tags=[dietary_preferences] if dietary_preferences else [],
-            ai_model_used='mistralai/Mixtral-8x7B-Instruct-v0.1',
+            ai_model_used=recipe_data.get('ai_model_used', 'mistralai/Mixtral-8x7B-Instruct-v0.1'),  # Use AI model from recipe data, fallback to Mistral for backwards compatibility
             generation_prompt=f"Ingredients: {', '.join(original_ingredients)}",
             created_at=datetime.utcnow()
         )
