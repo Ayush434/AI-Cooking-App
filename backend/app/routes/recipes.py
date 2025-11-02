@@ -267,6 +267,9 @@ def get_recipes():
         # Get optional parameters
         dietary_preferences = data.get('dietary_preferences', '')
         serving_size = data.get('serving_size', 1)
+        use_gemini = data.get('use_gemini', False)  # Opt-in for Gemini AI
+        
+        print(f"📥 Request received - use_gemini: {use_gemini}, ingredients: {len(ingredients)}", flush=True)
         
         # Check if user is logged in - verify JWT token if present
         user_id = None
@@ -279,22 +282,34 @@ def get_recipes():
                 user_id = get_jwt_identity()
                 if user_id:
                     user_id = int(user_id)
-                    print(f"User authenticated: user_id={user_id}")
+                    print(f"User authenticated: user_id={user_id}", flush=True)
                 else:
-                    print("No user_id found in token")
+                    print("No user_id found in token", flush=True)
             except Exception as e:
                 # Token is invalid - user is not logged in
-                print(f"JWT verification failed: {str(e)}")
+                print(f"JWT verification failed: {str(e)}", flush=True)
                 user_id = None
         else:
-            print("No Authorization header found - user not logged in")
+            print("No Authorization header found - user not logged in", flush=True)
             user_id = None
         
-        # Generate recipes using Hugging Face API
+        # Only allow Gemini AI if user is logged in AND explicitly opted in
+        # Otherwise, default to Mistral to preserve Gemini quota
+        can_use_gemini = user_id is not None and use_gemini
+        
+        if use_gemini and not user_id:
+            print("⚠️ Gemini AI requested but user not logged in - defaulting to Mistral", flush=True)
+        elif use_gemini and user_id:
+            print(f"✅ Gemini AI requested by logged-in user (id={user_id})", flush=True)
+        else:
+            print(f"ℹ️ Using default (Mistral AI) - use_gemini: {use_gemini}, logged_in: {user_id is not None}", flush=True)
+        
+        # Generate recipes
         recipes = recipe_service.get_recipes_from_ingredients(
             ingredients, 
             dietary_preferences=dietary_preferences, 
-            serving_size=serving_size
+            serving_size=serving_size,
+            use_gemini=can_use_gemini  # Only use Gemini if user is logged in and opted in
         )
         
         # If user is logged in, save recipes to database (limit to 10 most recent)

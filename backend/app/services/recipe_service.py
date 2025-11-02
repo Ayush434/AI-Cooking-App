@@ -99,32 +99,44 @@ class RecipeService:
             api_key=self.hf_token,
         ) if self.hf_token else None
 
-    def get_recipes_from_ingredients(self, ingredients: List[str], dietary_preferences: str = '', serving_size: int = 1) -> List[dict]:
+    def get_recipes_from_ingredients(self, ingredients: List[str], dietary_preferences: str = '', serving_size: int = 1, use_gemini: bool = False) -> List[dict]:
         """
-        Generate recipes from a list of ingredients using Gemini as primary AI, 
-        with Mistral as fallback if Gemini fails
+        Generate recipes from a list of ingredients.
+        Default uses Mistral AI. Gemini AI is only used if use_gemini=True (requires logged-in user).
         """
-        # Try Gemini first
-        if self.gemini_api_key and self.gemini_model:
-            try:
-                result = self._get_recipes_with_gemini(ingredients, dietary_preferences, serving_size)
-                # Check if result is successful (not an error)
-                if result and len(result) > 0 and not result[0].get('is_error', False):
-                    print(f"[GEMINI] ✓ Success - Recipe generated", flush=True)
-                    return result
-                else:
-                    raise Exception("Gemini returned error response")
-            except Exception as e:
-                error_msg = str(e)
-                if "quota" in error_msg.lower() or "429" in error_msg:
-                    print(f"[GEMINI] ✗ Quota exceeded, falling back to Mistral...", flush=True)
-                else:
-                    print(f"[GEMINI] ✗ Failed: {error_msg[:100]}", flush=True)
-                # Fall through to Mistral fallback
+        print(f"🔧 RecipeService.get_recipes_from_ingredients called - use_gemini: {use_gemini}, gemini_available: {self.gemini_model is not None}, mistral_available: {self.mistral_client is not None}", flush=True)
         
-        # Fallback to Mistral
+        # Only try Gemini if explicitly requested (and user is logged in - checked in route)
+        if use_gemini:
+            if not self.gemini_api_key:
+                print(f"[GEMINI] ✗ Not available - API key not configured", flush=True)
+            elif not self.gemini_model:
+                print(f"[GEMINI] ✗ Not available - Model not initialized", flush=True)
+            else:
+                try:
+                    print(f"[GEMINI] User opted in - Using Gemini AI", flush=True)
+                    result = self._get_recipes_with_gemini(ingredients, dietary_preferences, serving_size)
+                    # Check if result is successful (not an error)
+                    if result and len(result) > 0 and not result[0].get('is_error', False):
+                        print(f"[GEMINI] ✓ Success - Recipe generated", flush=True)
+                        return result
+                    else:
+                        raise Exception("Gemini returned error response")
+                except Exception as e:
+                    error_msg = str(e)
+                    if "quota" in error_msg.lower() or "429" in error_msg:
+                        print(f"[GEMINI] ✗ Quota exceeded, falling back to Mistral...", flush=True)
+                    else:
+                        print(f"[GEMINI] ✗ Failed: {error_msg[:100]}", flush=True)
+                    # Fall through to Mistral fallback
+        
+        # Default to Mistral AI (or fallback if Gemini failed)
         if self.hf_token and self.mistral_client:
             try:
+                if use_gemini:
+                    print(f"[MISTRAL] Fallback - Using Mistral AI", flush=True)
+                else:
+                    print(f"[MISTRAL] Default - Using Mistral AI", flush=True)
                 result = self._get_recipes_with_mistral(ingredients, dietary_preferences, serving_size)
                 # Check if result is successful (not an error)
                 if result and len(result) > 0 and not result[0].get('is_error', False):
