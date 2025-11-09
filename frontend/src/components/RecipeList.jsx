@@ -30,9 +30,28 @@ function RecipeList({ recipes, originalIngredients, dietaryPreferences, servingS
       return 'Gemini AI';
     }
     
-    // Format Mistral models
+    // Format Groq models (FREE AI API)
+    if (modelName.includes('llama') || modelName.includes('groq') || modelName.includes('mixtral')) {
+      if (modelName.includes('llama-3.1-70b')) return 'Groq (Llama 3.1 70B)';
+      if (modelName.includes('llama-3.1')) return 'Groq (Llama 3.1)';
+      if (modelName.includes('llama-3')) return 'Groq (Llama 3)';
+      if (modelName.includes('llama')) return 'Groq (Llama)';
+      if (modelName.includes('mixtral')) return 'Groq (Mixtral)';
+      return 'Groq';
+    }
+    
+    // Format OpenAI models (paid alternative)
+    if (modelName.includes('gpt') || modelName.includes('openai')) {
+      if (modelName.includes('4o-mini')) return 'OpenAI GPT-4o Mini';
+      if (modelName.includes('4o')) return 'OpenAI GPT-4o';
+      if (modelName.includes('4')) return 'OpenAI GPT-4';
+      if (modelName.includes('3.5')) return 'OpenAI GPT-3.5';
+      return 'OpenAI';
+    }
+    
+    // Format Mistral models (deprecated, kept for backwards compatibility)
     if (modelName.includes('mistral') || modelName.includes('Mixtral')) {
-      return 'Mistral AI';
+      return 'Mistral AI (Deprecated)';
     }
     
     // Fallback: return as-is or simplified

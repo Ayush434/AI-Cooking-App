@@ -181,7 +181,7 @@ def _save_recipe_to_db(recipe_data, user_id, original_ingredients, dietary_prefe
             original_ingredients=original_ingredients,
             serving_size=serving_size,
             dietary_tags=[dietary_preferences] if dietary_preferences else [],
-            ai_model_used=recipe_data.get('ai_model_used', 'mistralai/Mixtral-8x7B-Instruct-v0.1'),  # Use AI model from recipe data, fallback to Mistral for backwards compatibility
+            ai_model_used=recipe_data.get('ai_model_used', 'llama-3.1-8b-instant'),  # Use AI model from recipe data, fallback to Groq for backwards compatibility
             generation_prompt=f"Ingredients: {', '.join(original_ingredients)}",
             created_at=datetime.utcnow()
         )
@@ -294,15 +294,15 @@ def get_recipes():
             user_id = None
         
         # Only allow Gemini AI if user is logged in AND explicitly opted in
-        # Otherwise, default to Mistral to preserve Gemini quota
+        # Otherwise, default to Groq (FREE) to preserve Gemini quota
         can_use_gemini = user_id is not None and use_gemini
         
         if use_gemini and not user_id:
-            print("⚠️ Gemini AI requested but user not logged in - defaulting to Mistral", flush=True)
+            print("⚠️ Gemini AI requested but user not logged in - defaulting to Groq (FREE)", flush=True)
         elif use_gemini and user_id:
             print(f"✅ Gemini AI requested by logged-in user (id={user_id})", flush=True)
         else:
-            print(f"ℹ️ Using default (Mistral AI) - use_gemini: {use_gemini}, logged_in: {user_id is not None}", flush=True)
+            print(f"ℹ️ Using default (Groq - FREE) - use_gemini: {use_gemini}, logged_in: {user_id is not None}", flush=True)
         
         # Generate recipes
         recipes = recipe_service.get_recipes_from_ingredients(
