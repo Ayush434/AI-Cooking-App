@@ -21,7 +21,7 @@ class RecipeService:
         if not GEMINI_AVAILABLE:
             print("Warning: google-generativeai package not installed. Gemini AI will not be available.", flush=True)
         elif not self.gemini_api_key:
-            print("Warning: GEMINI_API_KEY not set. Will use Mistral as fallback.", flush=True)
+            pass  # Will use Groq as default
         else:
             # Initialize Gemini client
             try:
@@ -84,71 +84,51 @@ class RecipeService:
                     raise Exception("Could not initialize any Gemini model")
                     
             except Exception as e:
-                print(f"[GEMINI] Not available - Will use Mistral", flush=True)
                 self.gemini_model = None
                 self.gemini_model_name = None
         
-        # Get Hugging Face API token from environment variable (for Mistral fallback)
-        self.hf_token = os.getenv('HF_ACCESS_TOKEN')
-        if self.hf_token:
-            print(f"[MISTRAL] Initialized - Ready as fallback", flush=True)
+        # Get Groq API key from environment variable (FREE - default)
+        self.groq_api_key = os.getenv('GROQ_API_KEY')
+        self.groq_client = None
         
-        # Initialize OpenAI client for Together AI router (Mistral fallback)
-        self.mistral_client = OpenAI(
-            base_url="https://router.huggingface.co/together/v1",
-            api_key=self.hf_token,
-        ) if self.hf_token else None
+        if self.groq_api_key:
+            try:
+                # Initialize Groq client (FREE AI API - uses OpenAI-compatible interface)
+                self.groq_client = OpenAI(
+                    base_url="https://api.groq.com/openai/v1",
+                    api_key=self.groq_api_key,
+                )
+            except Exception as e:
+                self.groq_client = None
 
     def get_recipes_from_ingredients(self, ingredients: List[str], dietary_preferences: str = '', serving_size: int = 1, use_gemini: bool = False) -> List[dict]:
         """
         Generate recipes from a list of ingredients.
-        Default uses Mistral AI. Gemini AI is only used if use_gemini=True (requires logged-in user).
+        Default uses Groq (FREE). Gemini AI is only used if use_gemini=True (requires logged-in user).
         """
-        print(f"🔧 RecipeService.get_recipes_from_ingredients called - use_gemini: {use_gemini}, gemini_available: {self.gemini_model is not None}, mistral_available: {self.mistral_client is not None}", flush=True)
-        
         # Only try Gemini if explicitly requested (and user is logged in - checked in route)
         if use_gemini:
-            if not self.gemini_api_key:
-                print(f"[GEMINI] ✗ Not available - API key not configured", flush=True)
-            elif not self.gemini_model:
-                print(f"[GEMINI] ✗ Not available - Model not initialized", flush=True)
-            else:
+            if self.gemini_model:
                 try:
-                    print(f"[GEMINI] User opted in - Using Gemini AI", flush=True)
                     result = self._get_recipes_with_gemini(ingredients, dietary_preferences, serving_size)
-                    # Check if result is successful (not an error)
                     if result and len(result) > 0 and not result[0].get('is_error', False):
-                        print(f"[GEMINI] ✓ Success - Recipe generated", flush=True)
                         return result
-                    else:
-                        raise Exception("Gemini returned error response")
                 except Exception as e:
-                    error_msg = str(e)
-                    if "quota" in error_msg.lower() or "429" in error_msg:
-                        print(f"[GEMINI] ✗ Quota exceeded, falling back to Mistral...", flush=True)
-                    else:
-                        print(f"[GEMINI] ✗ Failed: {error_msg[:100]}", flush=True)
-                    # Fall through to Mistral fallback
+                    # Fall through to Groq fallback
+                    pass
         
-        # Default to Mistral AI (or fallback if Gemini failed)
-        if self.hf_token and self.mistral_client:
+        # Default to Groq (FREE, or fallback if Gemini failed)
+        if self.groq_api_key and self.groq_client:
             try:
-                if use_gemini:
-                    print(f"[MISTRAL] Fallback - Using Mistral AI", flush=True)
-                else:
-                    print(f"[MISTRAL] Default - Using Mistral AI", flush=True)
-                result = self._get_recipes_with_mistral(ingredients, dietary_preferences, serving_size)
-                # Check if result is successful (not an error)
+                result = self._get_recipes_with_groq(ingredients, dietary_preferences, serving_size)
                 if result and len(result) > 0 and not result[0].get('is_error', False):
-                    print(f"[MISTRAL] ✓ Success - Recipe generated", flush=True)
                     return result
                 else:
-                    raise Exception("Mistral returned error response")
+                    raise Exception("Groq returned error response")
             except Exception as e:
-                print(f"[MISTRAL] ✗ Failed: {str(e)[:100]}", flush=True)
-                return self._get_api_error_response(f"Both AI services failed. Please try again later.")
+                return self._get_api_error_response(f"Recipe generation failed: {str(e)[:200]}")
         else:
-            return self._get_api_error_response("No AI service configured.")
+            return self._get_api_error_response("Groq API key not configured. Please set GROQ_API_KEY environment variable.")
 
     def _get_recipes_with_gemini(self, ingredients: List[str], dietary_preferences: str = '', serving_size: int = 1) -> List[dict]:
         """
@@ -205,18 +185,14 @@ Make sure the recipe is:
         # Extract the generated recipe text
         generated_text = response.text
         
-        # Validate that the recipe is complete before parsing
-        if not self._is_recipe_complete(generated_text):
-            print("[GEMINI] Warning: Recipe appears incomplete", flush=True)
-        
-        # Parse the generated recipe (Gemini uses same format as Mistral)
-        model_name = self.gemini_model_name or 'gemini-1.5-flash'  # Use stored model name or default
+        # Parse the generated recipe
+        model_name = self.gemini_model_name or 'gemini-1.5-flash'
         parsed_result = self._parse_recipe(generated_text, ingredients, model_name)
         return parsed_result
 
-    def _get_recipes_with_mistral(self, ingredients: List[str], dietary_preferences: str = '', serving_size: int = 1) -> List[dict]:
+    def _get_recipes_with_groq(self, ingredients: List[str], dietary_preferences: str = '', serving_size: int = 1) -> List[dict]:
         """
-        Generate recipes using Mistral AI (fallback method)
+        Generate recipes using Groq (FREE AI API - uses Llama models)
         """
         ingredients_string = ", ".join(ingredients)
         
@@ -257,27 +233,53 @@ Make sure the recipe is:
 - Safe and practical for home cooking{' and follows the dietary preferences specified' if dietary_preferences else ''}
 - **Formatted in proper Markdown with headers, lists, and clear structure**"""
 
-        completion = self.mistral_client.chat.completions.create(
-            model="mistralai/Mixtral-8x7B-Instruct-v0.1",
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            max_tokens=3000,
-            temperature=0.7
-        )
-
-        # Extract the generated recipe text
-        generated_text = completion.choices[0].message.content
+        # List of Groq models to try in order (most preferred first)
+        groq_models = [
+            "llama-3.1-8b-instant",      # Fast, free, currently available
+            "llama-3.3-70b-versatile",   # Higher quality if available
+            "llama-3.1-70b-versatile",  # Fallback
+            "mixtral-8x7b-32768",        # Alternative model
+        ]
         
-        # Validate that the recipe is complete before parsing
-        if not self._is_recipe_complete(generated_text):
-            print("[MISTRAL] Warning: Recipe appears incomplete", flush=True)
+        generated_text = None
+        model_used = None
+        last_error = None
         
-        # Parse the generated recipe
-        parsed_result = self._parse_recipe(generated_text, ingredients, 'mistralai/Mixtral-8x7B-Instruct-v0.1')
+        # Try each model until one works
+        for model_name in groq_models:
+            try:
+                completion = self.groq_client.chat.completions.create(
+                    model=model_name,
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ],
+                    max_tokens=3000,
+                    temperature=0.7
+                )
+                
+                generated_text = completion.choices[0].message.content
+                model_used = model_name
+                break  # Success! Exit the loop
+                
+            except Exception as e:
+                error_msg = str(e)
+                last_error = error_msg
+                # Check if it's a model decommissioned error
+                if "decommissioned" in error_msg.lower() or "model_decommissioned" in error_msg.lower():
+                    continue  # Try next model
+                else:
+                    continue  # Try next model
+        
+        # If all models failed, raise an error
+        if not generated_text or not model_used:
+            error_msg = last_error or "All Groq models failed"
+            raise Exception(f"Groq API error: {error_msg[:200]}")
+        
+        # Parse the generated recipe using the actual model that succeeded
+        parsed_result = self._parse_recipe(generated_text, ingredients, model_used)
         return parsed_result
 
     def _is_recipe_complete(self, recipe_text: str) -> bool:
@@ -306,8 +308,6 @@ Make sure the recipe is:
         Works for both Gemini and Mistral outputs
         """
         try:
-            print(f"Parsing recipe text from {model_used}: {recipe_text}")
-            
             # Initialize default values
             title = "Generated Recipe"
             ingredients = []

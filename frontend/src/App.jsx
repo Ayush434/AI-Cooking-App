@@ -585,7 +585,7 @@ function AppContent() {
                           🚀 Use Gemini AI (Premium)
                         </span>
                         <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', color: 'var(--text-tertiary)', fontStyle: 'italic' }}>
-                          Faster and more reliable recipe generation. Default uses Mistral AI.
+                          Faster and more reliable recipe generation. Default uses Groq (FREE).
                         </p>
                       </div>
                     </label>

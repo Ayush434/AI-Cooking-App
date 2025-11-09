@@ -16,6 +16,7 @@ def get_database_url():
     print(f"Environment variables loaded:")
     print(f"  CALORIE_NINJAS_API_KEY: {'SET' if os.environ.get('CALORIE_NINJAS_API_KEY') else 'NOT SET'}")
     print(f"  GEMINI_API_KEY: {'SET' if os.environ.get('GEMINI_API_KEY') else 'NOT SET'}")
+    print(f"  GROQ_API_KEY: {'SET' if os.environ.get('GROQ_API_KEY') else 'NOT SET'}")
     print(f"  HF_ACCESS_TOKEN: {'SET' if os.environ.get('HF_ACCESS_TOKEN') else 'NOT SET'}")
     print(f"  DATABASE_URL: {'SET' if local_db_url else 'NOT SET'}")
     print(f"  CLOUD_SQL_PROJECT_ID: {'SET' if project_id else 'NOT SET'}")
@@ -72,7 +73,8 @@ class Config:
     
     # AI Service API Keys
     GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY')
-    HF_ACCESS_TOKEN = os.environ.get('HF_ACCESS_TOKEN')
+    GROQ_API_KEY = os.environ.get('GROQ_API_KEY')  # Free AI API (Groq) - Default
+    HF_ACCESS_TOKEN = os.environ.get('HF_ACCESS_TOKEN')  # Kept for backwards compatibility, but deprecated
     
     # SQLAlchemy Configuration
     SQLALCHEMY_DATABASE_URI = get_database_url()
