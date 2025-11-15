@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './App.css';
 import IngredientInput from './components/IngredientInput';
 import IngredientList from './components/IngredientList';
@@ -228,9 +228,13 @@ function AppContent() {
     setRandomIngredients([]);
   };
 
+  // Track previous authentication state to detect logout
+  const prevIsAuthenticatedRef = useRef(isAuthenticated);
+  
   // Reset Gemini preference and clear app state when user logs out
   useEffect(() => {
-    if (!isAuthenticated) {
+    // Only clear state if user was previously authenticated and now is not (logout)
+    if (prevIsAuthenticatedRef.current === true && !isAuthenticated) {
       setUseGemini(false);
       // Clear all app state when user logs out
       clearAllAppState();
@@ -240,6 +244,8 @@ function AppContent() {
       setAuthModalOpen(false);
       setSavedRecipesOpen(false);
     }
+    // Update the ref for next render
+    prevIsAuthenticatedRef.current = isAuthenticated;
   }, [isAuthenticated]);
 
   // Detect ingredients from image
@@ -319,7 +325,21 @@ function AppContent() {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
       const data = await res.json();
-      const recipes = data.recipes || [];
+      let recipes = data.recipes || [];
+      const savedIds = data.saved_ids || [];
+      
+      // If we have saved IDs but recipes don't have IDs, map them
+      if (savedIds.length > 0 && recipes.length === savedIds.length) {
+        recipes = recipes.map((recipe, index) => {
+          if (!recipe.id && savedIds[index]) {
+            return { ...recipe, id: savedIds[index] };
+          }
+          return recipe;
+        });
+      }
+      
+      // Log recipe IDs for debugging
+      console.log('📝 Received recipes with IDs:', recipes.map(r => ({ title: r.title, id: r.id })));
       
       // Validate that recipes are complete before displaying
       const hasCompleteRecipes = recipes.length > 0 && recipes.some(isRecipeComplete);
