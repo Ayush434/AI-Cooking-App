@@ -48,13 +48,6 @@ function AppContent() {
   
   const { user, loading: authLoading, getAuthHeaders, isAuthenticated } = useAuth();
   
-  // Reset Gemini preference when user logs out
-  useEffect(() => {
-    if (!isAuthenticated) {
-      setUseGemini(false);
-    }
-  }, [isAuthenticated]);
-  
   // Auto-populate dietary preferences from user profile when logged in and in recipe creation mode
   useEffect(() => {
     if (isAuthenticated && user && user.dietary_preferences && user.dietary_preferences.length > 0) {
@@ -234,6 +227,20 @@ function AppContent() {
     setServingSize(1);
     setRandomIngredients([]);
   };
+
+  // Reset Gemini preference and clear app state when user logs out
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setUseGemini(false);
+      // Clear all app state when user logs out
+      clearAllAppState();
+      // Navigate to homepage
+      goHome();
+      // Close any open modals
+      setAuthModalOpen(false);
+      setSavedRecipesOpen(false);
+    }
+  }, [isAuthenticated]);
 
   // Detect ingredients from image
   const detectIngredients = async (imageFile) => {
