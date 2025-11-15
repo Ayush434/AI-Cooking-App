@@ -322,6 +322,34 @@ def get_recipes():
             
             for idx, recipe_data in enumerate(recipes):
                 try:
+                    # Check current recipe count BEFORE saving
+                    current_count = Recipe.query.filter_by(user_id=user_id).count()
+                    
+                    # If we're at or over the limit, delete the oldest unfavourited recipe
+                    # If all recipes are favourited, delete the oldest one (even if favourited)
+                    if current_count >= MAX_RECIPES_PER_USER:
+                        # First, try to find the oldest unfavourited recipe
+                        oldest_unfavourited = Recipe.query.filter_by(
+                            user_id=user_id,
+                            is_saved=False  # Not favourited
+                        ).order_by(Recipe.created_at.asc()).first()
+                        
+                        if oldest_unfavourited:
+                            # Delete the oldest unfavourited recipe
+                            print(f"At recipe limit ({current_count}). Deleting oldest unfavourited recipe (id={oldest_unfavourited.id}, title={oldest_unfavourited.title})")
+                            db.session.delete(oldest_unfavourited)
+                            db.session.commit()
+                        else:
+                            # All recipes are favourited, delete the oldest one (even if favourited)
+                            oldest_recipe = Recipe.query.filter_by(
+                                user_id=user_id
+                            ).order_by(Recipe.created_at.asc()).first()
+                            
+                            if oldest_recipe:
+                                print(f"At recipe limit ({current_count}). All recipes are favourited. Deleting oldest recipe (id={oldest_recipe.id}, title={oldest_recipe.title})")
+                                db.session.delete(oldest_recipe)
+                                db.session.commit()
+                    
                     print(f"Saving recipe {idx+1}/{len(recipes)}: {recipe_data.get('title', 'Unknown')}")
                     saved_recipe = _save_recipe_to_db(
                         recipe_data, 
@@ -334,28 +362,12 @@ def get_recipes():
                     # Add recipe ID to response
                     recipe_data['id'] = saved_recipe.id
                     print(f"Successfully saved recipe with id={saved_recipe.id}")
-                    
-                    # After saving, check if we need to delete old recipes
-                    total_recipes = Recipe.query.filter_by(user_id=user_id).count()
-                    if total_recipes > MAX_RECIPES_PER_USER:
-                        # Get oldest recipes (excluding favourites)
-                        excess_count = total_recipes - MAX_RECIPES_PER_USER
-                        old_recipes = Recipe.query.filter_by(
-                            user_id=user_id,
-                            is_saved=False  # Only delete non-favourite recipes
-                        ).order_by(Recipe.created_at.asc()).limit(excess_count).all()
-                        
-                        for old_recipe in old_recipes:
-                            print(f"Deleting old recipe (id={old_recipe.id}, title={old_recipe.title}) to maintain {MAX_RECIPES_PER_USER} recipe limit")
-                            db.session.delete(old_recipe)
-                        
-                        db.session.commit()
-                        print(f"Deleted {len(old_recipes)} old recipes to maintain limit")
                         
                 except Exception as e:
                     import traceback
                     print(f"Failed to save recipe {idx+1} to database: {str(e)}")
                     print(traceback.format_exc())
+                    db.session.rollback()
                     # Continue even if saving fails
         else:
             if not user_id:
