@@ -328,10 +328,15 @@ function AppContent() {
       let recipes = data.recipes || [];
       const savedIds = data.saved_ids || [];
       
-      // If we have saved IDs but recipes don't have IDs, map them
-      if (savedIds.length > 0 && recipes.length === savedIds.length) {
+      // Map saved IDs to recipes - handle cases where lengths might not match exactly
+      if (savedIds.length > 0) {
         recipes = recipes.map((recipe, index) => {
-          if (!recipe.id && savedIds[index]) {
+          // If recipe already has an ID, keep it
+          if (recipe.id) {
+            return recipe;
+          }
+          // Otherwise, try to assign from savedIds array if available
+          if (index < savedIds.length && savedIds[index]) {
             return { ...recipe, id: savedIds[index] };
           }
           return recipe;
@@ -339,7 +344,7 @@ function AppContent() {
       }
       
       // Log recipe IDs for debugging
-      console.log('📝 Received recipes with IDs:', recipes.map(r => ({ title: r.title, id: r.id })));
+      console.log('📝 Received recipes with IDs:', recipes.map(r => ({ title: r.title, id: r.id, hasId: !!r.id })));
       
       // Validate that recipes are complete before displaying
       const hasCompleteRecipes = recipes.length > 0 && recipes.some(isRecipeComplete);
