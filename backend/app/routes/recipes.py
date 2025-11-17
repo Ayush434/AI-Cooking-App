@@ -199,6 +199,9 @@ def _save_recipe_to_db(recipe_data, user_id, original_ingredients, dietary_prefe
         
         # If ingredients is a list of strings, process them
         if recipe_ingredients_list:
+            # Track which ingredients have already been added to avoid duplicates
+            added_ingredient_ids = set()
+            
             for idx, ing in enumerate(recipe_ingredients_list):
                 if not ing or (isinstance(ing, str) and not ing.strip()):
                     continue
@@ -229,6 +232,22 @@ def _save_recipe_to_db(recipe_data, user_id, original_ingredients, dietary_prefe
                     # Get or create ingredient
                     ingredient = _get_or_create_ingredient(ingredient_name)
                     
+                    # Skip if this ingredient has already been added to this recipe
+                    if ingredient.id in added_ingredient_ids:
+                        print(f"Warning: Skipping duplicate ingredient '{ingredient_name}' (id={ingredient.id}) for recipe {recipe.id}")
+                        continue
+                    
+                    # Check if recipe_ingredient already exists in database (in case of partial save)
+                    existing = RecipeIngredient.query.filter_by(
+                        recipe_id=recipe.id,
+                        ingredient_id=ingredient.id
+                    ).first()
+                    
+                    if existing:
+                        print(f"Warning: Recipe-ingredient relationship already exists for recipe {recipe.id}, ingredient {ingredient.id}")
+                        added_ingredient_ids.add(ingredient.id)
+                        continue
+                    
                     # Create recipe-ingredient relationship
                     recipe_ingredient = RecipeIngredient(
                         recipe_id=recipe.id,
@@ -238,6 +257,7 @@ def _save_recipe_to_db(recipe_data, user_id, original_ingredients, dietary_prefe
                         order_index=idx
                     )
                     db.session.add(recipe_ingredient)
+                    added_ingredient_ids.add(ingredient.id)
         else:
             print(f"Warning: No ingredients to process for recipe {recipe.id}")
         
@@ -358,22 +378,34 @@ def get_recipes():
                         dietary_preferences, 
                         serving_size
                     )
-                    saved_recipe_ids.append(saved_recipe.id)
-                    # Add recipe ID to response
-                    recipe_data['id'] = saved_recipe.id
-                    print(f"Successfully saved recipe with id={saved_recipe.id}")
+                    recipe_id = saved_recipe.id
+                    saved_recipe_ids.append(recipe_id)
+                    # Add recipe ID to response immediately
+                    recipe_data['id'] = recipe_id
+                    print(f"Successfully saved recipe with id={recipe_id}, assigned to recipe_data")
                         
                 except Exception as e:
                     import traceback
                     print(f"Failed to save recipe {idx+1} to database: {str(e)}")
                     print(traceback.format_exc())
                     db.session.rollback()
+                    # Add None to saved_recipe_ids to maintain index alignment
+                    saved_recipe_ids.append(None)
                     # Continue even if saving fails
         else:
             if not user_id:
                 print("User not logged in, skipping recipe save")
             if not recipes:
                 print("No recipes to save")
+        
+        # Ensure all saved recipes have IDs in the response
+        for idx, recipe_data in enumerate(recipes):
+            if idx < len(saved_recipe_ids) and saved_recipe_ids[idx]:
+                recipe_data['id'] = saved_recipe_ids[idx]
+        
+        # Debug: Log recipe IDs being sent
+        print(f"📤 Sending {len(recipes)} recipes with IDs: {[r.get('id') for r in recipes]}")
+        print(f"📤 Saved IDs array: {saved_recipe_ids}")
         
         return jsonify({
             'recipes': recipes,
